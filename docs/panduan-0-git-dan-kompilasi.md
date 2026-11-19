@@ -81,14 +81,14 @@ di dalamnya, dan tidak ada kode solusi. Clone repo itu sebagai repo kerja, lalu 
 ke foldernya.
 
 ```sh
-git clone https://github.com/yayayapluto/Panduan-GachaQuest.git
-cd Panduan-GachaQuest
+git clone https://github.com/yayayapluto/GachaQuest.git
+cd GachaQuest
 ```
 
 **Expected**
 
 ```text
-Cloning into 'Panduan-GachaQuest'...
+Cloning into 'GachaQuest'...
 done.
 ```
 
@@ -386,6 +386,100 @@ kontrak: 36 item dan 12 monster.
 - Jangan mengubah test agar lulus. Kalau test gagal, perbaiki kodenya.
 - Jangan memakai `git push --force` ke `dev` atau `main`.
 - Jangan memakai `make` target di luar `all`, `start`, `test`, dan `clean`.
+
+## Push ke Repo Bersama
+
+Repo bersama kelompok ada di satu tempat, dan semuanya clone dari URL itu:
+
+```text
+https://github.com/yayayapluto/GachaQuest.git
+```
+
+Repo ini **publik**, jadi siapa pun bisa clone dan membaca. Yang bisa push hanya
+akun yang sudah diberi izin tulis oleh pemilik repo.
+
+### Langkah 1. Periksa remote di repo kerja
+
+`origin` harus menunjuk repo bersama, bukan repo pribadi.
+
+```sh
+git remote -v
+```
+
+**Expected**
+
+```text
+origin  https://github.com/yayayapluto/GachaQuest.git (fetch)
+origin  https://github.com/yayayapluto/GachaQuest.git (push)
+```
+
+Kalau `origin` masih menunjuk URL lain, arahkan ulang tanpa mengulang clone:
+
+```sh
+git remote set-url origin https://github.com/yayayapluto/GachaQuest.git
+```
+
+### Langkah 2. Minta izin tulis
+
+Repo publik tetap menolak push dari akun asing. Kirim username GitHub ke pemilik
+repo, lalu pemilik menambahkanmu sebagai collaborator:
+
+```sh
+gh api repos/yayayapluto/GachaQuest/collaborators/<username> -X PUT -f permission=push
+```
+
+**Expected**
+
+```text
+{"message":"Repository invitation added"}
+```
+
+Setelah undangan diterima, `git push` dari akunmu tidak lagi ditolak dengan
+`403`.
+
+### Langkah 3. Push branch kerja
+
+Selalu push branch sendiri, jangan push ke `dev` atau `main`.
+
+```sh
+git push -u origin feat/<modul>
+```
+
+**Expected**
+
+```text
+ * [new branch]      feat/<modul> -> feat/<modul>
+branch 'feat/<modul>' set up to track 'origin/feat/<modul>'.
+```
+
+### Langkah 4. Buka PR ke `dev`
+
+```sh
+gh pr create --base dev --head feat/<modul> \
+  --title "feat(<modul>): <ringkasan>" \
+  --body "Mengerjakan <modul> sesuai docs/panduan-<peran>. Semua test lulus."
+```
+
+**Expected**
+
+```text
+https://github.com/yayayapluto/GachaQuest/pull/<nomor>
+```
+
+P1 meninjau lalu menggabungkan. Sesudah PR gabung, seluruh anggota menarik versi
+baru:
+
+```sh
+git checkout dev
+git pull origin dev
+```
+
+### Aturan push
+
+- `git push --force` dilarang, termasuk ke branch fitur sendiri.
+- Jangan commit langsung ke `dev` atau `main`; keduanya hanya diisi lewat PR.
+- Kalau push ditolak `403`, izin tulis belum aktif: ulangi Langkah 2.
+- Kalau push ditolak `fetch first`, tarik dulu: `git pull --rebase origin dev`.
 
 ## Alur Git per Anggota
 
