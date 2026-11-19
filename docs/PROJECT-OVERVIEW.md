@@ -60,7 +60,7 @@ Tidak ada dependensi pihak ketiga. Semua fungsi sistem operasi dibungkus di dala
 Jalankan dari akar repo kerja hasil `git clone`:
 
 ```sh
-git clone <url-repo> gacha-quest
+git clone https://github.com/yayayapluto/Panduan-GachaQuest.git gacha-quest
 cd gacha-quest
 make
 make start
