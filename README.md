@@ -46,7 +46,7 @@ git --version
 Clone repo ini, masuk ke foldernya, lalu build dan jalankan:
 
 ```sh
-git clone <url-repo-ini>
+git clone https://github.com/yayayapluto/Panduan-GachaQuest.git
 cd Panduan-GachaQuest
 make
 make start
@@ -61,7 +61,7 @@ sebelum tahap itu selesai cukup clone repo dan baca dokumennya.
 
 Dari clone sampai pull request, urutannya begini:
 
-1. `git clone <url-repo-ini>` lalu `cd Panduan-GachaQuest`.
+1. `git clone https://github.com/yayayapluto/Panduan-GachaQuest.git` lalu `cd Panduan-GachaQuest`.
 2. `git checkout -b feat/<modul>` — satu branch per modul, misalnya `feat/dungeon`.
 3. Baca `docs/PRD.md` bagian 6, 7, dan 8 minimal sekali: aturan game, kontrak
    fungsi per modul, dan format file. Semua angka yang kamu butuhkan ada di sana.

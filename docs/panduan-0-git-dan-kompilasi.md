@@ -81,7 +81,7 @@ di dalamnya, dan tidak ada kode solusi. Clone repo itu sebagai repo kerja, lalu 
 ke foldernya.
 
 ```sh
-git clone <url-repo-kerja>
+git clone https://github.com/yayayapluto/Panduan-GachaQuest.git
 cd Panduan-GachaQuest
 ```
 
