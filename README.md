@@ -46,8 +46,8 @@ git --version
 Clone repo ini, masuk ke foldernya, lalu build dan jalankan:
 
 ```sh
-git clone https://github.com/yayayapluto/Panduan-GachaQuest.git
-cd Panduan-GachaQuest
+git clone https://github.com/yayayapluto/GachaQuest.git
+cd GachaQuest
 make
 make start
 make test
@@ -57,11 +57,16 @@ Perintah `make` baru berhasil setelah P1 menulis `Makefile` dan `main.c`. Keduan
 dikerjakan pada Milestone 1–2 di [Panduan P1](docs/panduan-P1-scaffold-ui.md), jadi
 sebelum tahap itu selesai cukup clone repo dan baca dokumennya.
 
+Repo itu publik: clone dan baca bebas, tetapi push butuh izin tulis dari pemilik.
+Cara mengatur remote, minta izin, push branch, dan membuka PR ada di bagian
+[Push ke Repo Bersama](docs/panduan-0-git-dan-kompilasi.md#push-ke-repo-bersama)
+pada Panduan 0.
+
 ## Alur Kerja per Anggota
 
 Dari clone sampai pull request, urutannya begini:
 
-1. `git clone https://github.com/yayayapluto/Panduan-GachaQuest.git` lalu `cd Panduan-GachaQuest`.
+1. `git clone https://github.com/yayayapluto/GachaQuest.git` lalu `cd GachaQuest`.
 2. `git checkout -b feat/<modul>` — satu branch per modul, misalnya `feat/dungeon`.
 3. Baca `docs/PRD.md` bagian 6, 7, dan 8 minimal sekali: aturan game, kontrak
    fungsi per modul, dan format file. Semua angka yang kamu butuhkan ada di sana.
