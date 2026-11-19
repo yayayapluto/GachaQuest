@@ -1,0 +1,97 @@
+#ifndef UI_H
+#define UI_H
+
+#include "config.h"
+#include "style.h"
+
+/* Draw callback for ui_menu_pick: draws the whole screen for the given selection. */
+typedef void (*UiDrawFn)(void *ctx, int sel);
+
+void ui_init(void);
+void ui_shutdown(void);
+int ui_interactive(void);
+void set_message(const char *fmt, ...);
+const char *last_message(void);
+
+/* Scrolling action log: shown in panels; printed immediately in fallback mode. */
+void ui_log(const char *fmt, ...);
+void ui_log_style(Style st, const char *fmt, ...);
+void ui_log_clear(void);
+/* Rich log line: actor and target/reason facts rendered with their own styles.
+   action is what the actor did (verb), value is the headline number or result
+   ("13 damage", "+12 gold"); pass NULL to omit the tail. */
+void ui_log_event(const char *actor, const char *action, const char *target,
+                  const char *value, Style actorSt, Style targetSt, Style valueSt);
+int ui_log_count(void);
+const char *ui_log_text(int i);          /* whole line, concatenated */
+Style ui_log_style_at(int i);
+int ui_log_part_count(int i);            /* styled segments of one line */
+const char *ui_log_part_text(int i, int part);
+Style ui_log_part_style(int i, int part);
+/* Draws one log line at row, mixing the per-segment styles; returns rows used. */
+void ui_log_draw(int row, int col, int maxW, int i);
+
+void ui_frame(const char *screen);       /* start a frame: wipe grid, draw title row */
+void ui_flush(void);                     /* send the frame to the terminal */
+
+void ui_panel(int row, int col, int w, int h, const char *title);
+void ui_hp_bar(int row, int col, int w, int hp, int maxHp);
+/* Exact-width HP bar shared by the Status panel and the Battle panel. */
+void ui_hp_bar_n(int row, int col, int w, int hp, int maxHp);
+void ui_bar(int row, int col, int w, int cur, int max, Style fill);
+void ui_menu_v(int row, int col, const char *const *items, const int *nums, int n, int sel);
+void ui_menu_h(int row, int col, const char *const *items, const int *nums, int n, int sel);
+void ui_footer(const char *extra);
+void ui_footer_line(const char *text);
+void ui_message(int row);                /* shows last_message when interactive */
+void ui_status_panel_at(const Player *p, int row, int col, int w);
+
+/* Menu loop shared by every screen. Returns the chosen number (not the index). */
+int ui_menu_pick(const char *const *items, const int *nums, int n,
+                 int minNum, int maxNum, UiDrawFn draw, void *ctx);
+
+/* Inline y/n confirmation in a box at the bottom of the current screen.
+   Returns 1 for Ya, 0 for Tidak/Esc. */
+int ui_confirm_box(const char *question);
+
+/* Line prompts: each prompt gets its own input frame (header + panel + "> "
+   prompt); the cursor is placed right after the prompt, computed from the
+   drawn frame, never from the terminal size. */
+void ui_input_screen(const char *name);      /* header title for the next prompt */
+void ui_line_begin(const char *fmt, ...);    /* draw the input box with this question */
+void ui_line_end(void);
+void ui_line_prompt(void);                   /* redraw the box at the prompt */
+void ui_line_error(const char *fmt, ...);    /* box + danger note line */
+void ui_line_note(const char *fmt, ...);     /* box + success note line */
+/* Inline editor inside the box: 1 line, 0 EOF, -1 Esc. */
+int ui_line_read(char *buf, int max);
+/* Input-box helpers, width-aware (wide glyphs count two columns). */
+int lebar_tampil(const char *s);
+int wrap_teks(const char *text, int width, char rows[][192], int maxRows);
+void render_input_box(const char *question, const char *buffer);
+
+/* Row picker for tables (inventory equip / shop sell). Returns index or -1. */
+int ui_pick_row(int count, UiDrawFn draw, void *ctx);
+
+/* Legacy print-style API, kept until every screen is migrated. */
+#define ANSI_RESET "\033[0m"
+#define ANSI_CYAN "\033[36m"
+#define ANSI_RED "\033[31m"
+#define ANSI_GREEN "\033[32m"
+#define ANSI_YELLOW "\033[33m"
+#define ANSI_MAGENTA "\033[35m"
+#define ANSI_DIM "\033[2m"
+
+int ui_utf8_enabled(void);
+void clear_screen(void);
+void draw_box_top(const char *title);
+void draw_box_bottom(void);
+void draw_box_line(const char *fmt, ...);
+void format_hp_bar(char *buf, int bufSize, int hp, int maxHp);
+void draw_header(const char *title, const Player *p);
+void draw_hp_bar(int hp, int maxHp);
+void draw_menu(int number, const char *label);
+const char *rarity_color(int rarity);
+const char *hp_color(int hp, int maxHp);
+
+#endif

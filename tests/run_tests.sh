@@ -1,0 +1,138 @@
+#!/bin/sh
+# Menjalankan semua pengujian Gacha Quest: driver C plus skenario menu bagian 15 PRD.
+# Pemakaian: sh tests/run_tests.sh [opsi-sanitizer-tambahan]
+set -u
+
+CC="${CC_BIN:-gcc}"
+case "$CC" in
+*clang64*)
+    CLANGDIR=$(dirname "$CC")
+    POSIXDIR=$(cygpath -u "$CLANGDIR" 2>/dev/null || echo "$CLANGDIR")
+    PATH="$POSIXDIR:$PATH"
+    export PATH
+    ;;
+esac
+CFLAGS="-std=c11 -Wall -Wextra -Wpedantic"
+INC="-Isrc/core -Isrc/util -Isrc/ui -Isrc/player -Isrc/battle -Isrc/gacha -Isrc/inventory -Isrc/shop -Isrc/storage -Isrc/dungeon -Isrc/platform"
+CFLAGS="$CFLAGS $INC"
+SAN="${1:-}"
+LIB="src/player/player.c src/battle/battle.c src/gacha/gacha.c src/inventory/inventory.c src/shop/shop.c src/storage/storage.c src/dungeon/dungeon.c src/util/util.c src/ui/ui.c src/ui/term.c src/ui/caps.c src/ui/style.c src/ui/render.c src/ui/widgets.c src/platform/rng.c src/platform/atomicfile.c src/platform/lock.c src/platform/sig.c src/platform/crash.c src/platform/autosave.c src/platform/log.c src/platform/platform.c"
+
+PASS=0
+FAIL=0
+
+lulus() { PASS=$((PASS + 1)); echo "LULUS  $1"; }
+gagal() { FAIL=$((FAIL + 1)); echo "GAGAL  $1"; }
+
+skenario() {
+    nama="$1"
+    input="$2"
+    pola="$3"
+    out_file="tests/out_last.txt"
+    ./bin/game < "$input" > "$out_file" 2>&1
+    status=$?
+    if [ $status -eq 0 ] && grep -q -- "$pola" "$out_file"; then
+        lulus "$nama"
+    else
+        gagal "$nama"
+    fi
+}
+
+driver() {
+    nama="$1"
+    exe="$2"
+    input="${3:-}"
+    if [ -n "$input" ]; then
+        if "./$exe" < "$input" > tests/out_last.txt 2>&1; then
+            lulus "$nama"
+        else
+            gagal "$nama"
+        fi
+    else
+        if "./$exe" > tests/out_last.txt 2>&1; then
+            lulus "$nama"
+        else
+            gagal "$nama"
+        fi
+    fi
+}
+
+echo "=== Membangun driver uji ==="
+mkdir -p bin
+$CC $CFLAGS $SAN -o bin/t_util tests/t_util.c $LIB
+$CC $CFLAGS $SAN -o bin/t_player tests/t_player.c $LIB
+$CC $CFLAGS $SAN -o bin/t_battle tests/t_battle.c $LIB
+$CC $CFLAGS $SAN -o bin/t_gacha tests/t_gacha.c $LIB
+$CC $CFLAGS $SAN -o bin/t_inventory tests/t_inventory.c $LIB
+$CC $CFLAGS $SAN -o bin/t_search tests/t_search.c $LIB
+$CC $CFLAGS $SAN -o bin/t_storage tests/t_storage.c $LIB
+$CC $CFLAGS $SAN -o bin/t_leaderboard tests/t_leaderboard.c $LIB
+$CC $CFLAGS $SAN -o bin/t_dungeon tests/t_dungeon.c $LIB
+$CC $CFLAGS $SAN -o bin/t_platform tests/t_platform.c $LIB
+$CC $CFLAGS $SAN -o bin/game main.c $LIB
+
+echo "=== Pengujian otomatis ==="
+rm -f data/leaderboard.txt
+
+driver "Pemain: statistik awal, EXP, naik level, total serangan" bin/t_player
+driver "Battle: rumus damage dan rentang hasil" bin/t_battle
+driver "S08 urut & cari inventory" bin/t_inventory
+driver "S19 selection sort & binary search" bin/t_search
+driver "S06/S07 rarity, pity, duplikat" bin/t_gacha
+driver "S12/S14 dungeon prosedur: seed deterministik, DFS & BFS" bin/t_dungeon
+
+rm -f data/autosave.dat data/autosave.bak
+driver "S17 autosave atomik: CRC, .bak, kunci sesi" bin/t_platform
+
+# slot files from earlier scenarios would make saveSlotFirstFree pick another
+# slot, so the round-trip driver starts from an empty slot set
+mkdir -p data/uji.bak
+for f in data/save_*.txt data/save.txt; do [ -f "$f" ] && mv -f "$f" "data/uji.bak/$(basename "$f")"; done
+driver "S10 save-load round trip" bin/t_storage
+for f in data/uji.bak/save_*.txt data/uji.bak/save.txt; do [ -f "$f" ] && mv -f "$f" "data/$(basename "$f")"; done
+rmdir data/uji.bak 2>/dev/null
+driver "S15 leaderboard urut & top 10" bin/t_leaderboard
+
+driver "S01/S02 bacaAngka & bacaString" bin/t_util tests/in_util.txt
+
+skenario "S01 nama kosong/terlalu panjang" tests/in_s01.txt "| Pemain : AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+skenario "S02 input huruf pada menu" tests/in_s02.txt "Input tidak valid"
+skenario "S03 battle sampai menang" tests/in_s03.txt "Hadiah:"
+skenario "S04 battle sampai kalah" tests/in_s04.txt "Kamu dikalahkan"
+skenario "S18 kalah membuka layar game over" tests/in_s04.txt "Mulai ulang (reset run)"
+skenario "S05 gacha 10x gold kurang" tests/in_s05.txt "Gold kurang! Butuh 900 gold"
+skenario "S09 jual item" tests/in_s09.txt "Terjual:"
+
+# Slot 1 must not exist yet: otherwise the overwrite confirmation eats an input line.
+rm -f data/save_1.txt
+cp -f data/leaderboard.txt data/leaderboard.uji.bak
+skenario "S10 simpan-lanjutkan" tests/in_s10.txt "Selamat datang kembali, UjiSv!"
+skenario "S15 leaderboard tercatat" tests/in_s15.txt "Skor UjiSkr"
+mv -f data/leaderboard.uji.bak data/leaderboard.txt
+
+# Legacy slot 1 is only read while data/save_1.txt is absent: hide the other
+# slots so the damaged legacy file is what slot 1 resolves to.
+mkdir -p data/uji.bak
+for f in data/save_*.txt; do [ -f "$f" ] && mv -f "$f" "data/uji.bak/$(basename "$f")"; done
+if [ -f data/save.txt ]; then cp -f data/save.txt data/save.uji.bak; fi
+printf "xxx|1|1|1|1|1|1|1|1|1|1|1|1|1|1\n" > data/save.txt
+skenario "S11 save.txt dirusak" tests/in_s11.txt "Gagal memuat"
+rm -f data/save.txt
+if [ -f data/save.uji.bak ]; then mv -f data/save.uji.bak data/save.txt; fi
+for f in data/uji.bak/save_*.txt; do [ -f "$f" ] && mv -f "$f" "data/$(basename "$f")"; done
+rmdir data/uji.bak 2>/dev/null
+skenario "S12 gerak ke tembok" tests/in_s12.txt "Tembok! Tidak bisa lewat."
+skenario "S13 hint gold kurang" tests/in_s13.txt "Gold kurang, hint butuh 30 gold"
+
+rm -f data/save_1.txt
+skenario "S16 seed dunia diminta saat game baru" tests/in_s16.txt "dibangun dari seed 777"
+hits=$(grep -c "dibangun dari seed 777" tests/out_last.txt)
+if [ "$hits" -eq 2 ]; then
+    lulus "S16 seed yang sama dipakai lagi setelah Load Game"
+else
+    gagal "S16 seed yang sama dipakai lagi setelah Load Game (ditemukan $hits kali)"
+fi
+
+echo ""
+echo "=== Ringkasan: $PASS lulus, $FAIL gagal ==="
+[ $FAIL -eq 0 ]

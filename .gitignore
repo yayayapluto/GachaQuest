@@ -1,0 +1,17 @@
+# Hasil kompilasi
+bin/
+
+# Keluaran pengujian
+tests/out_last.txt
+
+# Berkas runtime (dibuat saat game berjalan)
+data/save.txt
+data/save_*.txt
+data/leaderboard.txt
+data/autosave.dat
+data/autosave.bak
+data/session.lock
+data/crash.log
+data/game.log
+data/game.log.1
+data/*.tmp.*
