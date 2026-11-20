@@ -182,7 +182,7 @@ void render_flush(void)
 
     outLen = 0;
     output[0] = '\0';
-    if (caps_interactive()) appendText("\033[H");
+    if (caps_interactive()) appendText("\033[2J\033[H");
     for (r = 0; r < maxRowUsed; ++r) {
         last = caps_cols() - 1;
         if (last >= GRID_MAX_COLS) last = GRID_MAX_COLS - 1;
