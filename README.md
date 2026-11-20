@@ -62,6 +62,17 @@ Cara mengatur remote, minta izin, push branch, dan membuka PR ada di bagian
 [Push ke Repo Bersama](docs/panduan-0-git-dan-kompilasi.md#push-ke-repo-bersama)
 pada Panduan 0.
 
+## Status Implementasi P1
+
+Pada branch `feat/scaffold-ui`, lapisan P1 sudah terpasang: `Makefile`, `main.c`,
+`src/util`, `src/ui`, dan `src/platform`. Tag `contract-v1` mengunci header dan
+stub modul; tag `ui-ready` menandai alur Menu Utama sampai Hub siap dipakai.
+
+Modul P2 sampai P5 masih berupa stub netral sesuai pembagian tugas. Karena itu
+`make` berhasil tanpa warning, tetapi `make test` belum mencapai 24 lulus sampai
+implementasi modul tersebut digabung. Driver P1 (`t_util` dan `t_platform`) sudah
+lulus, begitu pula skenario seed baru S16.
+
 ## Alur Kerja per Anggota
 
 Dari clone sampai pull request, urutannya begini:
