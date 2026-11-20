@@ -247,22 +247,25 @@ int ui_menu_pick(const char *const *items, const int *nums, int n,
     int sel = 0;
     int result = -1;
 
-    (void)minNum;
-    (void)maxNum;
+
     if (n <= 0) return -1;
+    int needDraw = 1;
     for (;;) {
         TermKey key;
         char ch = '\0';
-        if (draw != NULL) draw(ctx, sel);
-        else {
-            ui_frame("PILIH");
-            ui_menu_v(3, 4, items, nums, n, sel);
-            ui_footer("");
-            ui_flush();
+        if (needDraw) {
+            if (draw != NULL) draw(ctx, sel);
+            else {
+                ui_frame("PILIH");
+                ui_menu_v(3, 4, items, nums, n, sel);
+                ui_footer("");
+                ui_flush();
+            }
+            needDraw = 0;
         }
         key = term_getkey(&ch);
-        if (key == KEY_UP) { --sel; if (sel < 0) sel = n - 1; }
-        else if (key == KEY_DOWN) { ++sel; if (sel >= n) sel = 0; }
+        if (key == KEY_UP) { --sel; if (sel < 0) sel = n - 1; needDraw = 1; }
+        else if (key == KEY_DOWN) { ++sel; if (sel >= n) sel = 0; needDraw = 1; }
         else if (key == KEY_ENTER) {
             if (nums != NULL) result = nums[sel];
             else result = sel + 1;
@@ -272,6 +275,16 @@ int ui_menu_pick(const char *const *items, const int *nums, int n,
             break;
         } else if (key == KEY_RESIZE) {
             term_poll_size();
+            needDraw = 1;
+        } else if (key == KEY_CHAR && ch >= '0' && ch <= '9') {
+            int digit = ch - '0';
+            if (minNum == 0) {
+                if (digit == 0) sel = n - 1;
+                else if (digit >= 1 && digit <= n - 1) sel = digit - 1;
+            } else if (digit >= minNum && digit <= maxNum) {
+                sel = digit - minNum;
+            }
+            needDraw = 1;
         } else if (key == KEY_CHAR && (ch == 'q' || ch == 'Q')) {
             result = -1;
             break;
@@ -407,13 +420,17 @@ int ui_pick_row(int count, UiDrawFn draw, void *ctx)
 {
     int sel = 0;
     if (count <= 0) return -1;
+    int needDraw = 1;
     for (;;) {
         TermKey key;
         char ch = '\0';
-        if (draw != NULL) draw(ctx, sel);
+        if (needDraw) {
+            if (draw != NULL) draw(ctx, sel);
+            needDraw = 0;
+        }
         key = term_getkey(&ch);
-        if (key == KEY_UP) { --sel; if (sel < 0) sel = count - 1; }
-        else if (key == KEY_DOWN) { ++sel; if (sel >= count) sel = 0; }
+        if (key == KEY_UP) { --sel; if (sel < 0) sel = count - 1; needDraw = 1; }
+        else if (key == KEY_DOWN) { ++sel; if (sel >= count) sel = 0; needDraw = 1; }
         else if (key == KEY_ENTER) return sel;
         else if (key == KEY_ESC || key == KEY_EOF || key == KEY_CHAR) {
             if (key != KEY_CHAR || ch == 'q' || ch == 'Q') return -1;

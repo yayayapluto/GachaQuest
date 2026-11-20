@@ -184,7 +184,8 @@ void render_flush(void)
     output[0] = '\0';
     if (caps_interactive()) appendText("\033[H");
     for (r = 0; r < maxRowUsed; ++r) {
-        last = GRID_MAX_COLS - 1;
+        last = caps_cols() - 1;
+        if (last >= GRID_MAX_COLS) last = GRID_MAX_COLS - 1;
         while (last >= 0 && grid[r][last].cp == 0) --last;
         if (last < 0) {
             appendText("\n");
