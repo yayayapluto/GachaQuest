@@ -76,8 +76,7 @@ void term_cooked(void)
 static int readByte(void)
 {
 #ifdef _WIN32
-    if (_kbhit()) return _getch();
-    return -1;
+    return _getch();
 #else
     unsigned char c;
     ssize_t n = read(0, &c, 1);
@@ -126,6 +125,18 @@ TermKey term_getkey(char *ch)
     }
     if (!waitInput()) return KEY_NONE;
     c = readByte();
+#ifdef _WIN32
+    if (c == 0 || c == 224) {
+        int ext = readByte();
+        switch (ext) {
+            case 72: return KEY_UP;
+            case 80: return KEY_DOWN;
+            case 75: return KEY_LEFT;
+            case 77: return KEY_RIGHT;
+            default: return KEY_ESC;
+        }
+    }
+#endif
     if (c < 0) return sig_requested() ? KEY_ESC : KEY_NONE;
     if (c == EOF) return KEY_EOF;
     if (c == 27) {
