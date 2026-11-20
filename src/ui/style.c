@@ -21,6 +21,7 @@ static void fillColor(int rich)
 {
     int i;
     fillMono();
+    fgTable[ST_TEXT] = rich ? "\033[38;5;252m" : "\033[37m";
     fgTable[ST_TITLE] = "\033[1;36m";
     fgTable[ST_ACCENT] = "\033[36m";
     fgTable[ST_BORDER] = "\033[90m";
