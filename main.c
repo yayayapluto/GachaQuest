@@ -24,7 +24,6 @@ static int jumlahMonster;
 static void gambarJudul(const char *judul, const char *info)
 {
     ui_frame(judul);
-    ui_panel(2, 2, 46, 15, judul);
     if (info != NULL) render_text(4, 4, ST_TEXT, "%s", info);
 }
 
