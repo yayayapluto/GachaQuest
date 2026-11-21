@@ -73,8 +73,7 @@ Fitur inti:
   dengan layar Game Over.
 - **Gacha** dua mode: pull 1x seharga 100 gold dan pull 10x seharga 900 gold, dengan
   sistem pity dan penalti duplikat.
-- **Inventory** menampung maksimal 36 item, bisa diurut tiga cara, dicari linear maupun
-  binary, dan dipasang sebagai senjata atau armor.
+- **Inventory** menampung maksimal 36 item, bisa diurut tiga cara, dicari linear, dan dipasang sebagai senjata atau armor.
 - **Shop** menjual potion dan membeli kembali item dari inventori.
 - **Dungeon** prosedural ber-seed: bergerak, menemukan treasure, peti, dan monster, membeli
   hint, semuanya deterministik terhadap seed.
@@ -93,7 +92,7 @@ Fitur inti:
 | Hub | `1..7`, `0` | Battle, Gacha, Inventory, Shop, Dungeon, Status, Save, kembali |
 | Battle | `1..4` | Serang, Bertahan, Potion, Kabur; hasil tiap ronde tercatat di log |
 | Gacha | `1`/`2`, `0` | pull 1x (100 gold), pull 10x (900 gold), kembali |
-| Inventory | `1..4`, `0` | urutkan, cari (termasuk `4` Cari item (binary)), pasang lewat pemilih baris |
+| Inventory | `1..4`, `0` | urutkan, cari (menu `4` Cari item), pasang lewat pemilih baris |
 | Shop | `1`/`2`, `0` | beli potion, jual item (pemilih baris + konfirmasi), kembali |
 | Status | tombol apa pun | panel statistik lengkap, lalu kembali |
 | Dungeon | `w/a/s/d`, `h`, `q` | bergerak empat arah, beli hint (30 gold), keluar run |

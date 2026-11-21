@@ -30,8 +30,4 @@ jobs:
           test "$summary" = "=== Ringkasan: 5 lulus, 18 gagal ==="
 
       - name: Parity
-        run: |
-          set +e
-          sh tests/parity.sh 2>&1 | tee parity.log
-          echo "parity_exit=${PIPESTATUS[0]}"
-          set -e
+        run: sh tests/parity.sh

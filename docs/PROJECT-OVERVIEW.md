@@ -127,7 +127,7 @@ bersama hanya boleh diubah lewat P1.
 | `src/player` | P3 | Statistik pemain, pengalaman, naik level, total atk dan def, tampilan status. |
 | `src/battle` | P3 | Perhitungan kerusakan, kritikal, loop pertarungan, hadiah, kalah, layar game over. |
 | `src/gacha` | P4 | Undian kelangkaan, pity, tarik satu dan sepuluh, harga duplikat, pencarian item untuk pull. |
-| `src/inventory` | P4 | Urut bubble dan selection, pencarian linear dan binary, pemasangan item, sinkronisasi item terpasang. |
+| `src/inventory` | P4 | Urut bubble dan selection, pencarian linear, pemasangan item, sinkronisasi item terpasang. |
 | `src/shop` | P5 | Beli potion dengan batas stok, jual item duplikat dengan konfirmasi. |
 | `src/storage` | P5 | Muat katalog dan monster, simpan dan muat lima slot, papan skor, pengelolaan berkas. |
 | `src/dungeon` | P2 | Pembangkitan dunia per seed, chunk, validasi DFS, jalur BFS, kamera, gerak, treasure, hint, chest. |
