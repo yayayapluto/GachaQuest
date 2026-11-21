@@ -24,7 +24,9 @@ cp "$ROOT/tests/in_golden.txt" "$TMP/in.txt"
 (cd "$TMP" && "./bin/$NAME" < in.txt > out_raw.txt 2>&1) || true
 tr -d '\r' < "$TMP/out_raw.txt" > "$TMP/out.txt"
 
-if diff -u "$ROOT/tests/out_golden.txt" "$TMP/out.txt"; then
+tr -d '\r' < "$ROOT/tests/out_golden.txt" > "$TMP/golden.txt"
+
+if diff -u "$TMP/golden.txt" "$TMP/out.txt"; then
     echo "PARITAS OK: output sama dengan tests/out_golden.txt"
     exit 0
 fi
