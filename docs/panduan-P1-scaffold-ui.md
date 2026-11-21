@@ -38,7 +38,7 @@ Proyek ini adalah game terminal berbahasa C11 tanpa dependensi luar. Sebagai P1 
 
 Batasan keras yang berlaku untuk semua kode P1:
 
-- C11 murni, dikompilasi dengan `-std=c11 -Wall -Wextra -Wpedantic` dan nol warning.
+- C11 murni, dikompilasi dengan `-std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L` dan nol warning.
 - Tanpa `malloc`, `calloc`, `realloc`, `free`, dan tanpa fungsi rekursif. Semua penyimpanan memakai array tetap.
 - Hanya `src/platform` yang memanggil API sistem operasi: file, sinyal, thread, waktu, konsol, dan socket.
 - Angka acak selalu lewat `plat_rand()`, tidak pernah `rand()` atau `srand()`.
@@ -126,7 +126,7 @@ Prompt siap tempel ke AI. Lampirkan `docs/panduan-P1-scaffold-ui.md` beserta hea
 ```text
 Kamu mengerjakan peran P1 pada proyek game terminal C11. File yang kamu sentuh hanya Makefile, main.c, src/core/config.h, src/util/*, src/ui/*, dan src/platform/*. Jangan menyentuh src/player, src/battle, src/gacha, src/inventory, src/shop, src/storage, atau src/dungeon; file itu milik peran lain dan hanya boleh kamu stub.
 
-Aturan yang tidak boleh dilanggar: kode harus lolos -std=c11 -Wall -Wextra -Wpedantic tanpa warning; tanpa malloc/free dan tanpa rekursi; semua penyimpanan array tetap; hanya src/platform yang memanggil API OS; semua angka acak lewat plat_rand, tidak pernah rand atau srand; tidak ada printf layar di luar src/util dan src/platform.
+Aturan yang tidak boleh dilanggar: kode harus lolos -std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L tanpa warning; tanpa malloc/free dan tanpa rekursi; semua penyimpanan array tetap; hanya src/platform yang memanggil API OS; semua angka acak lewat plat_rand, tidak pernah rand atau srand; tidak ada printf layar di luar src/util dan src/platform.
 
 Pakai hanya fungsi publik dan konstanta yang sudah ada di header yang dilampirkan. Jangan menambah fungsi publik baru, jangan mengganti nama, jangan mengubah tipe parameter, dan jangan mengarang fungsi di luar daftar di panduan. Kalau butuh fungsi baru, berhenti dan tanyakan.
 
@@ -161,7 +161,7 @@ Lalu tulis `Makefile` dengan empat target. Bentuk minimalnya seperti ini:
 
 ```make
 CC      ?= gcc
-CFLAGS  ?= -std=c11 -Wall -Wextra -Wpedantic
+CFLAGS  ?= -std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L
 INC      = -Isrc/core -Isrc/util -Isrc/ui -Isrc/player -Isrc/battle \
            -Isrc/gacha -Isrc/inventory -Isrc/shop -Isrc/storage \
            -Isrc/dungeon -Isrc/platform
@@ -274,7 +274,7 @@ int main(void) {
     return 0;
 }
 EOF
-gcc -std=c11 -Wall -Wextra -Wpedantic -Isrc/core -Isrc/util \
+gcc -std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L -Isrc/core -Isrc/util \
     -o /tmp/uji_util /tmp/uji_util.c src/util/util.c
 printf 'abc\n9\n3\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n' | /tmp/uji_util
 ```
@@ -320,7 +320,7 @@ Bentuk file `data/autosave.dat` sudah ditentukan: magic `GQAS`, versi, panjang, 
 
 ```sh
 make
-gcc -std=c11 -Wall -Wextra -Wpedantic \
+gcc -std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L \
     -Isrc/core -Isrc/util -Isrc/ui -Isrc/player -Isrc/battle \
     -Isrc/gacha -Isrc/inventory -Isrc/shop -Isrc/storage \
     -Isrc/dungeon -Isrc/platform \
