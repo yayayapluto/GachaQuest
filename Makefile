@@ -1,5 +1,5 @@
 CC      ?= gcc
-CFLAGS  ?= -std=c11 -Wall -Wextra -Wpedantic
+CFLAGS  ?= -std=c11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L
 INC      = -Isrc/core -Isrc/util -Isrc/ui -Isrc/player -Isrc/battle \
            -Isrc/gacha -Isrc/inventory -Isrc/shop -Isrc/storage \
            -Isrc/dungeon -Isrc/platform
