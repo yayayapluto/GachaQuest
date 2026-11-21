@@ -1,12 +1,16 @@
-# Gacha Quest — Paket Panduan Proyek Akhir
+# Gacha Quest
 
-Paket ini memandu satu tim membangun **Gacha Quest**, permainan terminal berbasis
-C11 dengan battle, gacha, inventory, shop, dan dungeon prosedural yang deterministik
-per seed. Di dalamnya ada spesifikasi produk, ringkasan arsitektur, pembagian lima
-peran, dan langkah kerja tiap peran. Root repo sudah memuat seluruh header modul di
-`src/` (tanpa satu pun `.c`), data katalog contoh di `data/`, dan skrip pengujian di
-`tests/`. Semua dokumen ditulis supaya bisa diikuti tanpa kode solusi, sehingga tim
-menyusun sendiri implementasinya.
+Repo kerja tim untuk **Gacha Quest**, permainan terminal C11 dengan battle, gacha,
+inventory, shop, storage, dan dungeon prosedural yang deterministik per seed.
+Header modul, data katalog, driver uji, `Makefile`, `main.c`, lapisan P1, dan stub
+P2–P5 sudah ada. Panduan peran, PRD, dan pembagian tugas ada di repo
+[Panduan-GachaQuest](https://github.com/yayayapluto/Panduan-GachaQuest) dan disalin
+ke `docs/` repo ini.
+
+Status per 21 Nov 2026: branch `dev` berisi scaffold P1. `make` bersih tanpa
+warning; `make test` menjalankan 23 cek dan menghasilkan **5 lulus, 18 gagal**
+karena modul P2–P5 masih stub. Angka ini bukan target: target rilis adalah
+23 lulus, 0 gagal setelah semua modul selesai.
 
 ## Daftar Isi
 
@@ -53,9 +57,8 @@ make start
 make test
 ```
 
-Perintah `make` baru berhasil setelah P1 menulis `Makefile` dan `main.c`. Keduanya
-dikerjakan pada Milestone 1–2 di [Panduan P1](docs/panduan-P1-scaffold-ui.md), jadi
-sebelum tahap itu selesai cukup clone repo dan baca dokumennya.
+Perintah `make` dan `make test` sudah bisa dijalankan di branch `dev`. `make start`
+membutuhkan terminal interaktif minimal 50×20.
 
 Repo itu publik: clone dan baca bebas, tetapi push butuh izin tulis dari pemilik.
 Cara mengatur remote, minta izin, push branch, dan membuka PR ada di bagian
@@ -64,14 +67,31 @@ pada Panduan 0.
 
 ## Status Implementasi P1
 
-Pada branch `feat/scaffold-ui`, lapisan P1 sudah terpasang: `Makefile`, `main.c`,
-`src/util`, `src/ui`, dan `src/platform`. Tag `contract-v1` mengunci header dan
-stub modul; tag `ui-ready` menandai alur Menu Utama sampai Hub siap dipakai.
+Lapisan P1 sudah terpasang: `Makefile`, `main.c`, `src/util`, `src/ui`, dan
+`src/platform`. Tag `contract-v1` menunjuk commit pengunci header dan data
+(`3068d29`); tag `ui-ready` menunjuk commit scaffold lengkap dengan UI
+(`b665343`), jadi kedua tag tidak lagi menunjuk commit yang sama.
 
 Modul P2 sampai P5 masih berupa stub netral sesuai pembagian tugas. Karena itu
-`make` berhasil tanpa warning, tetapi `make test` belum mencapai 24 lulus sampai
-implementasi modul tersebut digabung. Driver P1 (`t_util` dan `t_platform`) sudah
-lulus, begitu pula skenario seed baru S16.
+`make` berhasil tanpa warning, tetapi `make test` baru menghasilkan 5 lulus dan
+18 gagal dari 23 cek. Driver P1 (`t_util`, `t_platform`) dan skenario seed baru
+S16 sudah lulus; sisanya menunggu implementasi modul.
+
+## Branch per Peran
+
+Nama branch di bawah ini sama dengan properti `Branch` di tracker Notion.
+
+| Peran | Branch |
+|---|---|
+| P1 scaffold, UI, platform | `feat/scaffold-ui` |
+| P1 integrasi | `feat/integrasi` |
+| P1 rilis | `feat/rilis` |
+| P2 dungeon | `feat/dungeon` |
+| P3 battle dan player | `feat/battle-player` |
+| P4 gacha dan inventory | `feat/gacha-inventory` |
+| P5 shop dan storage | `feat/shop-storage` |
+
+Branch `dev` adalah tujuan semua PR. `main` hanya menerima merge rilis.
 
 ## Alur Kerja per Anggota
 
@@ -95,10 +115,10 @@ dipakai. Jangan melampirkan seluruh repo.
 
 | Anggota | Panduan yang dilampirkan | Header pendukung | Skenario yang harus lulus |
 |---|---|---|---|
-| P1 | [Panduan P1](docs/panduan-P1-scaffold-ui.md) | `src/core/config.h`, `src/util/util.h`, `src/platform/*.h` | S01, S02, S17, dan `make test` 24 baris lulus |
+| P1 | [Panduan P1](docs/panduan-P1-scaffold-ui.md) | `src/core/config.h`, `src/util/util.h`, `src/platform/*.h` | S01, S02, S17, dan 23 cek `make test` |
 | P2 | [Panduan P2](docs/panduan-P2-dungeon.md) | `src/dungeon/dungeon.h`, `src/core/config.h` | S12, S13, S14, S16 |
 | P3 | [Panduan P3](docs/panduan-P3-battle-player.md) | `src/player/player.h`, `src/battle/battle.h` | S03, S04, S18 |
-| P4 | [Panduan P4](docs/panduan-P4-gacha-inventory.md) | `src/gacha/gacha.h`, `src/inventory/inventory.h` | S05, S08, S09, S19 |
+| P4 | [Panduan P4](docs/panduan-P4-gacha-inventory.md) | `src/gacha/gacha.h`, `src/inventory/inventory.h` | S05, S08, S09 |
 | P5 | [Panduan P5](docs/panduan-P5-shop-storage.md) | `src/storage/storage.h`, `src/shop/shop.h` | S09, S10, S11, S15 |
 
 Setiap panduan peran sudah memuat `## Konteks untuk AI` berisi angka pasti,
@@ -109,21 +129,20 @@ aturan yang tidak ada di kontrak. Untuk urusan git, kompilasi, dan build, ikut
 lampirkan juga `docs/panduan-0-git-dan-kompilasi.md`; dokumen itu berlaku untuk
 semua anggota.
 
-## Struktur Awal Itu Spesifikasi, Bukan Solusi
+## Struktur Repo
 
-Root repo sengaja hanya berisi tiga hal:
+Repo ini sudah berisi implementasi scaffold, bukan hanya header:
 
-- `src/**/*.h` — 23 header berisi konstanta, struct, dan prototipe fungsi
-  publik seluruh modul. Ini janji antarmuka, bukan implementasi.
-- `data/item.txt` dan `data/monster.txt` — katalog contoh berformat
-  pipa yang harus dibaca program.
-- `tests/` — skrip `run_tests.sh`, seluruh driver `t_*`, dan input skenario
-  S01–S19 sebagai acuan penerimaan.
+- `Makefile`, `main.c` — target `all`, `start`, `test`, `clean` dan alur menu utama.
+- `src/**/*.h` — kontrak publik seluruh modul. Perubahan header lewat P1.
+- `src/**/*.c` — implementasi P1 di `util`, `ui`, dan `platform`; modul P2–P5
+  masih stub yang mengembalikan nilai netral.
+- `data/item.txt` dan `data/monster.txt` — katalog contoh berformat pipa.
+- `tests/` — `run_tests.sh`, sembilan driver `t_*`, dan input skenario S01–S18.
 
-Tidak ada satu pun berkas `src/**/*.c` di dalam repo ini, dan tidak ada `Makefile`
-di root. Implementasi, Makefile, serta `main.c` adalah pekerjaan tim. Header dipakai
-apa adanya; kalau sebuah fungsi butuh tanda tangan berbeda, perubahan diusulkan ke
-P1 supaya semua pemilik modul menyesuaikan diri pada versi yang sama.
+Header dipakai apa adanya; kalau sebuah fungsi butuh tanda tangan berbeda,
+perubahan diusulkan ke P1 supaya semua pemilik modul menyesuaikan diri pada versi
+yang sama.
 
 ## Peran Sekilas
 
@@ -148,9 +167,10 @@ Dari root repo:
 sh tests/run_tests.sh
 ```
 
-Skrip ini mengompilasi game dan seluruh driver `t_*`, lalu menjalankan 19 skenario
-(S01–S19). Setiap baris hasil menandai lulus atau gagal. Pengujian butuh `gcc` dan
-`make` yang sudah terpasang, jadi selesaikan dulu langkah pada
+Skrip ini mengompilasi game dan sembilan driver `t_*`, lalu menjalankan 13
+pemanggilan skenario S01–S18. Totalnya 23 cek karena S16 diuji dua kali. Setiap
+baris hasil menandai lulus atau gagal. Pengujian butuh `gcc` dan `make` yang sudah
+terpasang, jadi selesaikan dulu langkah pada
 [Panduan 0](docs/panduan-0-git-dan-kompilasi.md).
 
 ## Checklist Demo

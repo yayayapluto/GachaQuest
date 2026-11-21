@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+    branches: [dev, main, "fix/**"]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          make clean
+          make 2>&1 | tee make.log
+          test -x bin/game
+
+      - name: Test
+        run: |
+          set +e
+          make test 2>&1 | tee test.log
+          set -e
+          summary=$(grep -E '^=== Ringkasan:' test.log | tail -1)
+          echo "$summary"
+          # Baseline scaffold P1: 23 cek, 5 lulus, 18 gagal. Ganti angka ini
+          # setelah modul P2-P5 digabung dan hasilnya berubah.
+          test "$summary" = "=== Ringkasan: 5 lulus, 18 gagal ==="
+
+      - name: Parity
+        run: |
+          set +e
+          sh tests/parity.sh 2>&1 | tee parity.log
+          echo "parity_exit=${PIPESTATUS[0]}"
+          set -e
