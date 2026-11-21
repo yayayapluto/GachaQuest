@@ -18,13 +18,6 @@ int searchItemByName(const Player *p, const char *word)
     return -1;
 }
 
-int searchItemByNameBinary(const Player *p, const char *word)
-{
-    (void)p;
-    (void)word;
-    return -1;
-}
-
 void equipItem(Player *p, int index)
 {
     (void)p;
