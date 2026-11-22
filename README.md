@@ -7,10 +7,11 @@ P2–P5 sudah ada. Panduan peran, PRD, dan pembagian tugas ada di repo
 [Panduan-GachaQuest](https://github.com/yayayapluto/Panduan-GachaQuest) dan disalin
 ke `docs/` repo ini.
 
-Status per 21 Nov 2026: branch `dev` berisi scaffold P1. `make` bersih tanpa
-warning; `make test` menjalankan 23 cek dan menghasilkan **5 lulus, 18 gagal**
-karena modul P2–P5 masih stub. Angka ini bukan target: target rilis adalah
-23 lulus, 0 gagal setelah semua modul selesai.
+Status per 22 Nov 2026: branch `main` berisi scaffold P1 dengan lapisan UI dan
+platform hidup. `make` bersih tanpa warning; `make test` menjalankan 23 cek dan
+menghasilkan **3 lulus, 20 gagal** karena modul P2–P5 masih stub. Angka ini
+bukan target: target rilis adalah 23 lulus, 0 gagal setelah semua modul selesai.
+Angka baseline yang sama dipakai `.github/workflows/ci.yml`.
 
 ## Daftar Isi
 
@@ -57,7 +58,7 @@ make start
 make test
 ```
 
-Perintah `make` dan `make test` sudah bisa dijalankan di branch `dev`. `make start`
+Perintah `make` dan `make test` sudah bisa dijalankan di branch `main`. `make start`
 membutuhkan terminal interaktif minimal 50×20.
 
 Repo itu publik: clone dan baca bebas, tetapi push butuh izin tulis dari pemilik.
@@ -67,15 +68,15 @@ pada Panduan 0.
 
 ## Status Implementasi P1
 
-Lapisan P1 sudah terpasang: `Makefile`, `main.c`, `src/util`, `src/ui`, dan
-`src/platform`. Tag `contract-v1` menunjuk commit pengunci header dan data
-(`3068d29`); tag `ui-ready` menunjuk commit scaffold lengkap dengan UI
-(`b665343`), jadi kedua tag tidak lagi menunjuk commit yang sama.
+Lapisan P1 sudah terpasang dan hidup: `Makefile`, `main.c`, `src/util`,
+`src/ui`, dan `src/platform`. Menu Utama, Game Baru, Load Game, Leaderboard,
+dan Hub bisa digambar dan dikendalikan; mode non-interaktif tetap mencetak teks
+polos tanpa kode escape.
 
 Modul P2 sampai P5 masih berupa stub netral sesuai pembagian tugas. Karena itu
-`make` berhasil tanpa warning, tetapi `make test` baru menghasilkan 5 lulus dan
-18 gagal dari 23 cek. Driver P1 (`t_util`, `t_platform`) dan skenario seed baru
-S16 sudah lulus; sisanya menunggu implementasi modul.
+`make` berhasil tanpa warning, tetapi `make test` baru menghasilkan 3 lulus dan
+20 gagal dari 23 cek. Driver P1 (`t_platform`) dan skenario utilisasi
+(`S01/S02 bacaAngka & bacaString`) lulus; sisanya menunggu implementasi modul.
 
 ## Branch per Peran
 
@@ -91,7 +92,7 @@ Nama branch di bawah ini sama dengan properti `Branch` di tracker Notion.
 | P4 gacha dan inventory | `feat/gacha-inventory` |
 | P5 shop dan storage | `feat/shop-storage` |
 
-Branch `dev` adalah tujuan semua PR. `main` hanya menerima merge rilis.
+Branch `main` adalah satu-satunya branch tetap: semua PR per peran masuk ke sana.
 
 ## Alur Kerja per Anggota
 
@@ -105,8 +106,8 @@ Dari clone sampai pull request, urutannya begini:
    setiap blok `Expected` sebelum lanjut ke langkah berikutnya.
 5. Setelah P1 menyelesaikan Milestone 1–2, jalankan `make` lalu `make test`
    sebelum commit. Keduanya harus bersih dari warning dan kegagalan.
-6. Commit dengan format `feat(<modul>): ...`, `git push`, buka PR ke `dev`, lalu
-   tunggu review P1.
+6. Commit dengan format `feat(<modul>): ...`, `git push`, buka PR ke `main`,
+   lalu tunggu review P1.
 
 ## Panduan dan Lampiran untuk Bertanya ke AI
 
