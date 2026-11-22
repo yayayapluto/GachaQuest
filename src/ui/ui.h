@@ -34,6 +34,20 @@ void ui_log_draw(int row, int col, int maxW, int i);
 void ui_frame(const char *screen);       /* start a frame: wipe grid, draw title row */
 void ui_flush(void);                     /* send the frame to the terminal */
 
+/* Layar standar untuk modul lain: judul + info + footer + pesan.
+   ui_screen_begin("DUNGEON", "Pusat kegiatan"); ... ui_screen_end("Panah: gerak"); */
+#define UI_INFO_ROW 2                    /* baris info di bawah garis judul */
+#define UI_CONTENT_ROW 4                 /* baris isi pertama */
+void ui_screen_begin(const char *title, const char *info);
+void ui_screen_end(const char *hint);    /* footer + pesan + flush, sekali per frame */
+
+/* Panel daftar satu kolom dengan scroll otomatis mengikuti `sel` (indeks).
+   h termasuk dua baris border; isi yang muat = h-2. */
+void ui_list_panel(int row, int col, int w, int h, const char *title,
+                   const char *const *items, int n, int sel);
+/* Panel log: menggambar `lines` entri log terakhir, lengkap dengan stylenya. */
+void ui_log_panel(int row, int col, int w, int h, const char *title, int lines);
+
 void ui_panel(int row, int col, int w, int h, const char *title);
 void ui_hp_bar(int row, int col, int w, int hp, int maxHp);
 /* Exact-width HP bar shared by the Status panel and the Battle panel. */

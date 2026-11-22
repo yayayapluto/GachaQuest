@@ -144,6 +144,40 @@ Header dipakai apa adanya; kalau sebuah fungsi butuh tanda tangan berbeda,
 perubahan diusulkan ke P1 supaya semua pemilik modul menyesuaikan diri pada versi
 yang sama.
 
+## Helper UI untuk P2-P5
+
+`src/ui/ui.h` menyediakan helper layar supaya modul lain tidak perlu menulis
+koordinat header/footer sendiri:
+
+| Helper | Kegunaan |
+|---|---|
+| `ui_screen_begin(judul, info)` | frame baru: judul + garis + baris info di `UI_INFO_ROW` (2) |
+| `ui_screen_end(hint)` | footer + pesan sistem + flush, sekali per frame |
+| `ui_list_panel(row, col, w, h, judul, items, n, sel)` | panel daftar dengan highlight dan scroll otomatis |
+| `ui_log_panel(row, col, w, h, judul, lines)` | panel berisi `lines` entri log terakhir, lengkap dengan style |
+| `ui_line_begin/read/error/end` | input baris di dalam kotak Input (sudah menangani raw/cooked dan mode pipa) |
+| `ui_confirm_box(pertanyaan)` | konfirmasi Ya/Tidak inline, `1`/`0` |
+| `ui_menu_pick(...)` | loop menu; mengembalikan nomor pilihan, `-1` saat Esc |
+
+Contoh layar modul:
+
+```c
+static void gambarDungeon(void *ctx, int sel)
+{
+    Dungeon *d = ctx;
+    ui_screen_begin("DUNGEON", "Pusat kegiatan");
+    ui_list_panel(UI_CONTENT_ROW, 4, 40, 10, "Aksi", aksi, 4, sel);
+    ui_log_panel(UI_CONTENT_ROW, 48, 48, 10, "Log", 8);
+    ui_screen_end("Panah: pilih");
+}
+
+int pilih = ui_menu_pick(aksi, nomor, 4, 1, 4, gambarDungeon, &d);
+```
+
+Aturan: satu frame = `ui_screen_begin` -> gambar isi -> `ui_screen_end`.
+P2-P5 tidak memanggil `printf` atau `render_*` langsung untuk layar; mode pipa
+(non-interaktif) otomatis jatuh ke teks polos lewat helper input/menu.
+
 ## Peran Sekilas
 
 | Kode | Level | Peran | File milik |

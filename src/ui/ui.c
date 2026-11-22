@@ -215,6 +215,55 @@ void ui_frame(const char *screen)
 
 void ui_flush(void) { render_flush(); }
 
+void ui_screen_begin(const char *title, const char *info)
+{
+    ui_frame(title);
+    if (info != NULL) render_text(UI_INFO_ROW, 4, ST_TEXT, "%s", info);
+}
+
+void ui_screen_end(const char *hint)
+{
+    ui_footer(hint);
+    ui_footer_message();
+    ui_flush();
+}
+
+void ui_list_panel(int row, int col, int w, int h, const char *title,
+                   const char *const *items, int n, int sel)
+{
+    int vis, first, i;
+
+    if (items == NULL || n <= 0 || h < 3 || w < 4) return;
+    vis = h - 2;
+    if (vis > n) vis = n;
+    first = 0;
+    if (sel >= vis) first = sel - vis + 1;
+    if (first > n - vis) first = n - vis;
+    ui_panel(row, col, w, h, title);
+    for (i = 0; i < vis; i++) {
+        int idx = first + i;
+        int on = idx == sel;
+        render_text(row + 1 + i, col + 1, on ? ST_ACCENT : ST_TEXT, "%s",
+                    on ? caps_glyphs()->marker : " ");
+        render_text_clipped(row + 1 + i, col + 3, w - 4,
+                            on ? ST_SELECTED : ST_TEXT, "%s", items[idx]);
+    }
+}
+
+void ui_log_panel(int row, int col, int w, int h, const char *title, int lines)
+{
+    int count = ui_log_count();
+    int start, i;
+
+    if (h < 3 || w < 4) return;
+    if (lines > h - 2) lines = h - 2;
+    if (lines > count) lines = count;
+    start = count - lines;
+    ui_panel(row, col, w, h, title);
+    for (i = 0; i < lines; i++)
+        ui_log_draw(row + 1 + i, col + 2, w - 4, start + i);
+}
+
 void ui_panel(int row, int col, int w, int h, const char *title)
 {
     widget_panel(row, col, w, h, title);
