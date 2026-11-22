@@ -58,8 +58,9 @@ int pilih = ui_menu_pick(items, nums, n, minNum, maxNum, gambarLayar, ctx);
 ```
 
 - `items[i]` teks menu, `nums[i]` nomor yang dikembalikan.
-- `gambarLayar(ctx, sel)` menggambar seluruh layar untuk indeks terpilih `sel`
-  (`sel == -1` di mode pipa berarti tidak ada sorotan).
+- `gambarLayar(ctx, sel)` menggambar seluruh layar untuk indeks terpilih `sel`.
+  Di mode pipa callback dipanggil sekali dengan `sel == -1`, jadi jangan
+  mengindeks array dengan `sel` tanpa memeriksa `sel >= 0`.
 - Tombol: panah/W/S, angka langsung, Enter memilih, Esc kembali (`0`) bila ada
   nomor 0, selain itu diabaikan.
 - Kembalian: nomor dari `nums`, `0` untuk kembali, `-1` saat EOF.
@@ -151,10 +152,15 @@ Aturan:
 | `ui_log_panel(row, col, w, h, judul, lines)` | gambar `lines` entri terakhir di dalam panel |
 | `ui_panel(row, col, w, h, judul)` | panel kosong berborder |
 | `ui_status_panel_at(&pemain, row, col, w)` | panel Pemain/Level/HP/Gold/Potion |
-| `ui_hp_bar_n(row, col, w, hp, maxHp)` | bar HP lebar tepat `w`, warna ikut ambang |
+| `ui_hp_bar_n(row, col, w, hp, maxHp)` | bar HP lebar tepat `w`, warna ikut ambang (dipakai panel Status dan Battle) |
+| `ui_hp_bar(row, col, w, hp, maxHp)` | bar HP berpadding; dipakai `ui_status_panel_at`, modul lain pakai `ui_hp_bar_n` |
+| `ui_log_count()` / `ui_log_text(i)` / `ui_log_draw(row, col, w, i)` | akses log per baris bila layar butuh tata letak sendiri |
 | `ui_bar(row, col, w, cur, max, gaya)` | bar umum (EXP, progress) |
 | `set_message(fmt, ...)` | siapkan pesan sistem untuk frame berikutnya |
 | `ui_footer_message()` | gambar pesan itu satu baris di bawah footer |
+| `ui_footer(hint)` | footer mentah; `ui_screen_end` sudah memanggil ini |
+| `ui_footer_line(teks)` | footer pengganti tanpa hint menu (mis. layar peta) |
+| `ui_message(row)` | pesan di baris tetap; hindari, pakai `ui_footer_message` |
 
 Contoh layar dengan log:
 
@@ -260,7 +266,7 @@ atas. Kalau butuh teks satu baris di luar panel, `render_text` boleh.
 if (ui_interactive()) {
     ui_menu_pick(...);
 } else {
-    /* alur teks: promp input/validasi saja */
+    /* alur teks: prompt input/validasi saja */
 }
 ```
 
