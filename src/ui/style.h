@@ -1,45 +1,101 @@
 #ifndef STYLE_H
 #define STYLE_H
 
-/* Semantic style tokens. Screens pick a token, style.c turns it into the best
-   ANSI sequence the detected terminal supports (mono drops everything). */
+/**
+ * @file style.h
+ * @brief Token gaya semantik dan pemetaannya ke ANSI.
+ *
+ * Modul tidak menulis escape ANSI sendiri. Pilih token yang sesuai makna
+ * (bahaya, sukses, rarity, HP), lalu render/ui yang memilih warna terbaik
+ * sesuai kemampuan terminal (256 warna, 16 warna, atau mono).
+ */
+
+/**
+ * @brief Token gaya; pilih berdasarkan makna, bukan warna.
+ */
 typedef enum {
-    ST_TEXT = 0,
-    ST_TITLE,       /* bold + accent */
-    ST_ACCENT,
-    ST_BORDER,
-    ST_DIM,
-    ST_GOLD,
-    ST_DANGER,
-    ST_SUCCESS,
-    ST_RARITY_COMMON,
-    ST_RARITY_RARE,
-    ST_RARITY_EPIC,
-    ST_RARITY_LEGENDARY,
-    ST_BRONZE,
-    ST_SELECTED,    /* selection background; foreground chosen by the widget */
-    ST_FOG1,        /* distance fog: three fading grey levels (near..far) */
-    ST_FOG2,
-    ST_FOG3,
-    ST_BIOME_BASE,  /* +0..7 dungeon biome wall styles, do not use directly */
-    ST_BIOME_FOG_BASE = ST_BIOME_BASE + 8, /* +tier*8+biome, faded walls */
-    ST_HP_GRAD_BASE = ST_BIOME_FOG_BASE + 24, /* +0..10 gradient slots */
+    ST_TEXT = 0,        /**< teks biasa */
+    ST_TITLE,           /**< judul layar: tebal + aksen */
+    ST_ACCENT,          /**< aksen: marker, judul panel, angka penting */
+    ST_BORDER,          /**< garis dan sudut panel */
+    ST_DIM,             /**< teks sekunder/hint */
+    ST_GOLD,            /**< nilai emas/ekonomi */
+    ST_DANGER,          /**< bahaya, gagal, HP rendah */
+    ST_SUCCESS,         /**< berhasil, pulih, aman */
+    ST_RARITY_COMMON,   /**< item rarity 1 */
+    ST_RARITY_RARE,     /**< item rarity 2 */
+    ST_RARITY_EPIC,     /**< item rarity 3 */
+    ST_RARITY_LEGENDARY,/**< item rarity 4 */
+    ST_BRONZE,          /**< aksen sekunder (mis. peringkat) */
+    ST_SELECTED,        /**< latar baris terpilih; warna depan dipilih widget */
+    ST_FOG1,            /**< kabut jarak dekat */
+    ST_FOG2,            /**< kabut jarak sedang */
+    ST_FOG3,            /**< kabut jarak jauh */
+    ST_BIOME_BASE,      /**< dasar gaya dinding biome; jangan dipakai langsung */
+    ST_BIOME_FOG_BASE = ST_BIOME_BASE + 8, /**< dasar gaya dinding berkabut */
+    ST_HP_GRAD_BASE = ST_BIOME_FOG_BASE + 24, /**< dasar gradasi bar HP */
     ST_COUNT
 } Style;
 
+/**
+ * @brief Token gradasi bar HP pada slot ke-i.
+ * @param i indeks slot 0..10; naik seiring HP.
+ */
 #define ST_HP_GRAD(i) ((Style)(ST_HP_GRAD_BASE + (i)))
+/**
+ * @brief Token gaya dinding biome ke-i.
+ * @param i indeks biome 0..7.
+ */
 #define ST_BIOME(i) ((Style)(ST_BIOME_BASE + (i)))
-#define ST_FOG_LEVEL(i) ((Style)(ST_FOG1 + (i)))          /* i = 0..2 */
+/**
+ * @brief Token gaya kabut pada tingkat ke-i.
+ * @param i 0 = dekat, 1 = sedang, 2 = jauh.
+ */
+#define ST_FOG_LEVEL(i) ((Style)(ST_FOG1 + (i)))
+/**
+ * @brief Token gaya dinding biome b pada tingkat kabut tier.
+ * @param tier 0..BIOME_FOG_TIERS-1;
+ * @param bi indeks biome 0..BIOME_COUNT-1.
+ */
 #define ST_BIOME_FOG(tier, bi) ((Style)(ST_BIOME_FOG_BASE + (tier) * BIOME_COUNT + (bi)))
+/** @brief Jumlah biome yang punya gaya dinding. */
 #define BIOME_COUNT 8
+/** @brief Jumlah tingkat kabut untuk dinding biome. */
 #define BIOME_FOG_TIERS 3
 
-void style_init(void);           /* build ANSI strings for the detected mode */
+/**
+ * @brief Bangun tabel ANSI sesuai kemampuan terminal yang terdeteksi.
+ * @note Dipanggil ui_init(); bukan untuk modul.
+ */
+void style_init(void);
 
-Style style_rarity(int rarity);   /* Item rarity 1..4 -> token */
-Style style_hp(int hp, int maxHp);/* threshold token for 256/16/mono modes */
+/**
+ * @brief Token gaya untuk tingkat rarity item.
+ * @param rarity 1..4 (di luar itu jatuh ke common).
+ * @return ST_RARITY_COMMON..ST_RARITY_LEGENDARY.
+ */
+Style style_rarity(int rarity);
 
-const char *style_fg(Style s);    /* "" in mono */
-const char *style_bg(Style s);    /* "" in mono; selected uses bg color or reverse */
+/**
+ * @brief Token gaya untuk HP berdasarkan ambang (aman/sedang/bahaya).
+ * @param hp nilai HP sekarang;
+ * @param maxHp nilai maksimum.
+ * @return token gaya yang sesuai.
+ */
+Style style_hp(int hp, int maxHp);
+
+/**
+ * @brief Urutan escape warna depan untuk satu token.
+ * @param s token gaya.
+ * @return string ANSI, atau "" pada mode mono.
+ */
+const char *style_fg(Style s);
+
+/**
+ * @brief Urutan escape warna latar untuk satu token.
+ * @param s token gaya.
+ * @return string ANSI, atau "" pada mode mono.
+ */
+const char *style_bg(Style s);
 
 #endif

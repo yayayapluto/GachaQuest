@@ -4,6 +4,11 @@ Dokumen ini untuk pemilik modul P2-P5. Tujuannya satu: layar, input, dan
 konfirmasi cukup memanggil fungsi di `src/ui/ui.h`, tanpa menghitung baris
 terminal atau menulis escape ANSI sendiri.
 
+Setiap fungsi publik di `src/ui/ui.h`, `render.h`, `style.h`, dan `widgets.h`
+punya komentar Doxygen lengkap dengan parameter dan nilai kembalian. Di VS Code,
+arahkan kursor ke nama fungsi (atau ketik nama lalu `Ctrl+Space`) untuk melihat
+deskripsinya tanpa membuka dokumen ini.
+
 Semua fungsi UI sudah menangani dua mode:
 
 | Mode | Kapan | Yang terjadi |
