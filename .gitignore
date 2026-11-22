@@ -11,6 +11,7 @@ data/leaderboard.txt
 data/autosave.dat
 data/autosave.bak
 data/session.lock
+data/session.run
 data/crash.log
 data/game.log
 data/game.log.1
