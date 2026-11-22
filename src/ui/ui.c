@@ -286,15 +286,19 @@ void ui_status_panel_at(const Player *p, int row, int col, int w)
 static int menuPickFallback(const char *const *items, const int *nums, int n,
                             int minNum, int maxNum, UiDrawFn draw, void *ctx)
 {
-    int i;
+    int i, value;
     draw(ctx, -1);
     ui_flush();
-    for (i = 0; i < n; i++)
-        printf(" %d. %s\n", nums[i], items[i]);
+    if (items != NULL) {
+        for (i = 0; i < n; i++)
+            printf(" %d. %s\n", nums != NULL ? nums[i] : minNum + i, items[i]);
+    }
     if (lastMessage[0] != '\0')
         printf("%s\n", lastMessage);
     printf("Pilih: ");
-    return readInt("", minNum, maxNum);
+    fflush(stdout);
+    if (!readIntTry("", minNum, maxNum, &value)) return -1;
+    return value;
 }
 
 static void keyWait(int key)

@@ -9,9 +9,8 @@ ke `docs/` repo ini.
 
 Status per 22 Nov 2026: branch `main` berisi scaffold P1 dengan lapisan UI dan
 platform hidup. `make` bersih tanpa warning; `make test` menjalankan 23 cek dan
-menghasilkan **3 lulus, 20 gagal** karena modul P2–P5 masih stub. Angka ini
+menghasilkan **6 lulus, 17 gagal** karena modul P2–P5 masih stub. Angka ini
 bukan target: target rilis adalah 23 lulus, 0 gagal setelah semua modul selesai.
-Angka baseline yang sama dipakai `.github/workflows/ci.yml`.
 
 ## Daftar Isi
 
@@ -74,8 +73,8 @@ dan Hub bisa digambar dan dikendalikan; mode non-interaktif tetap mencetak teks
 polos tanpa kode escape.
 
 Modul P2 sampai P5 masih berupa stub netral sesuai pembagian tugas. Karena itu
-`make` berhasil tanpa warning, tetapi `make test` baru menghasilkan 3 lulus dan
-20 gagal dari 23 cek. Driver P1 (`t_platform`) dan skenario utilisasi
+`make` berhasil tanpa warning, tetapi `make test` baru menghasilkan 6 lulus dan
+17 gagal dari 23 cek. Driver P1 (`t_platform`) dan skenario utilisasi
 (`S01/S02 bacaAngka & bacaString`) lulus; sisanya menunggu implementasi modul.
 
 ## Branch per Peran
