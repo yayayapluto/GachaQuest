@@ -14,12 +14,82 @@ Semua fungsi UI sudah menangani dua mode:
 Karena itu modul tidak perlu bercabang sendiri untuk mode pipa, kecuali saat
 menggambar layar penuh (lihat bagian Aturan).
 
+## 0. Sebelum mulai (untuk yang baru pertama kali)
+
+Kamu tidak perlu paham terminal, ANSI, atau raw mode. Cukup pahami lima istilah
+ini:
+
+| Istilah | Artinya di panduan ini |
+|---|---|
+| grid | buffer karakter layar. Kamu menggambar ke buffer, bukan langsung ke terminal |
+| flush | mengirim isi grid ke terminal. Biasanya sudah dilakukan `ui_screen_end` |
+| callback | fungsi yang **kamu** tulis, lalu dipanggil UI; mis. fungsi menggambar layar |
+| sel | indeks pilihan `0..n-1`. Ini bukan nomor menu |
+| mode pipa | output dialihkan (mis. `sh tests/run_tests.sh`); layar jadi teks polos |
+
+Aturan pembagian kerja: **P1 memiliki `main.c` dan `src/ui/`. Kamu menulis
+modulmu di `src/<modul>/` dan memanggil fungsi UI dari sana.** P1 yang
+menyambungkan modulmu ke menu game.
+
+Cara mencoba hasilmu:
+
+```bash
+make            # kompilasi game + modul
+./bin/game      # Windows: bin\game.exe
+make test       # memastikan skenario teks tidak rusak
+```
+
+Semua contoh di bawah bisa langsung ditaruh di file modulmu. Kalau baru mulai,
+salin contoh paling kecil ini dulu, panggil fungsinya dari modulmu, lalu
+kembangkan:
+
+```c
+#include "ui.h"
+
+static const char *const contohItems[] = { "Mulai", "Keluar" };
+static const int contohNums[] = { 1, 0 };
+
+static void gambarContoh(void *ctx, int sel)
+{
+    (void)ctx;
+    ui_screen_begin("CONTOH", "layar pertama saya");
+    ui_menu_v(UI_CONTENT_ROW, 6, contohItems, contohNums, 2, sel);
+    ui_screen_end("Panah: pilih   Enter: konfirmasi");
+}
+
+int contohJalan(void)
+{
+    int pilih = ui_menu_pick(contohItems, contohNums, 2, 0, 1, gambarContoh, NULL);
+    return pilih;   /* 1 = Mulai, 0 = Keluar/kembali, -1 = EOF */
+}
+```
+
+Yang terjadi: `ui_screen_begin` membersihkan layar dan menulis judul,
+`ui_menu_v` menggambar dua pilihan, `ui_screen_end` menulis footer dan
+mengirim semuanya ke terminal. `ui_menu_pick` yang menangani tombol panah dan
+Enter.
+
+Kesalahan pemula yang paling sering:
+
+| Gejala | Penyebab |
+|---|---|
+| layar kosong | lupa `ui_screen_end`/`ui_flush`, jadi grid tidak pernah dikirim |
+| tulisan numpuk | memanggil `printf` di samping helper UI |
+| pilihan tidak cocok | menganggap kembalian `ui_menu_pick` sebagai indeks; padahal itu nomor dari `nums` |
+| crash saat mode test | callback menggambar memakai `sel` sebagai indeks saat `sel == -1` |
+| fungsi tidak ditemukan | lupa `#include "ui.h"` atau file belum masuk `Makefile` (minta P1) |
+
 ## 1. Kerangka layar
 
 Urutan tetap satu frame:
 
 ```c
 #include "ui.h"
+
+typedef struct {
+    const char *const *items;
+    int n;
+} Layar;
 
 static void gambarLayar(void *ctx, int sel)
 {
@@ -275,8 +345,12 @@ diperlukan kalau modul memanggil `ui_screen_*` langsung di luar `ui_menu_pick`.
 
 ## 9. Contoh lengkap: layar dengan menu + log + input
 
+Potongan ini mengandaikan modulmu sudah punya `Player` (dari `player.h`) dan
+struktur state sendiri. Ganti `LayarDungeon` dengan struktur modulmu.
+
 ```c
 #include "ui.h"
+#include "player.h"
 
 typedef struct {
     Player pemain;
