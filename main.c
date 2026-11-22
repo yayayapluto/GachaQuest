@@ -44,8 +44,8 @@ static void gambarMenuUtama(void *ctx, int sel)
     (void)ctx;
     gambarJudul("GACHA QUEST", "Petualangan terminal deterministik per seed");
     ui_menu_v(4, 6, menuUtamaItems, menuUtamaNums, 4, sel);
-    ui_footer("Panah: pilih | Enter: ok | Esc: batal");
-    ui_message(17);
+    ui_footer(NULL);
+    ui_footer_message();
     ui_flush();
 }
 
@@ -54,8 +54,8 @@ static void gambarHub(void *ctx, int sel)
     (void)ctx;
     gambarJudul("HUB", "Pusat kegiatan petualangan");
     ui_menu_v(4, 6, hubItems, hubNums, 8, sel);
-    ui_footer("Panah: pilih | Enter: ok | Esc: kembali");
-    ui_message(17);
+    ui_footer(NULL);
+    ui_footer_message();
     ui_flush();
 }
 
@@ -80,8 +80,8 @@ static void gambarSlot(void *ctx, int sel)
     }
     gambarJudul("LOAD GAME", "Pilih slot penyimpanan");
     ui_menu_v(4, 6, items, nums, SAVE_SLOTS, sel);
-    ui_footer("Enter: muat | Esc: batal");
-    ui_message(17);
+    ui_footer("Enter: muat");
+    ui_footer_message();
     ui_flush();
 }
 

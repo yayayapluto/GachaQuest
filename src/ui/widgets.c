@@ -100,6 +100,7 @@ void widget_menu_h(int row, int col, const char *const *items, const int *nums,
 static int footerRow = -1;
 
 void widget_footer_reset(void) { footerRow = -1; }
+int widget_footer_row(void) { return footerRow; }
 
 void widget_footer(const char *extra)
 {

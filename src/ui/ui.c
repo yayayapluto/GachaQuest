@@ -260,6 +260,14 @@ void ui_message(int row)
     if (caps_interactive()) widget_msg(row, 0, UI_COLS, lastMessage);
 }
 
+void ui_footer_message(void)
+{
+    int row = widget_footer_row();
+    if (!caps_interactive()) return;
+    if (row < 0) row = 15;
+    widget_msg(row + 2, 0, UI_COLS, lastMessage);
+}
+
 /* Player status panel: Pemain/Level/HP bar/Gold+Potion inside a bordered panel. */
 void ui_status_panel_at(const Player *p, int row, int col, int w)
 {

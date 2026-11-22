@@ -44,6 +44,7 @@ void ui_menu_h(int row, int col, const char *const *items, const int *nums, int 
 void ui_footer(const char *extra);
 void ui_footer_line(const char *text);
 void ui_message(int row);                /* shows last_message when interactive */
+void ui_footer_message(void);            /* message one blank row under the footer */
 void ui_status_panel_at(const Player *p, int row, int col, int w);
 
 /* Menu loop shared by every screen. Returns the chosen number (not the index). */
