@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "config.h"
 #include "util.h"
 #include "ui.h"
 #include "term.h"
 #include "platform.h"
+#include "rng.h"
 #include "render.h"
 #include "autosave.h"
 #include "player.h"
@@ -24,7 +26,7 @@ static int jumlahMonster;
 static void gambarJudul(const char *judul, const char *info)
 {
     ui_frame(judul);
-    if (info != NULL) render_text(4, 4, ST_TEXT, "%s", info);
+    if (info != NULL) render_text(2, 4, ST_TEXT, "%s", info);
 }
 
 static const char *const menuUtamaItems[] = {
@@ -41,7 +43,7 @@ static void gambarMenuUtama(void *ctx, int sel)
 {
     (void)ctx;
     gambarJudul("GACHA QUEST", "Petualangan terminal deterministik per seed");
-    ui_menu_v(6, 6, menuUtamaItems, menuUtamaNums, 4, sel);
+    ui_menu_v(4, 6, menuUtamaItems, menuUtamaNums, 4, sel);
     ui_footer("Panah: pilih | Enter: ok | Esc: batal");
     ui_message(17);
     ui_flush();
@@ -51,7 +53,7 @@ static void gambarHub(void *ctx, int sel)
 {
     (void)ctx;
     gambarJudul("HUB", "Pusat kegiatan petualangan");
-    ui_menu_v(5, 6, hubItems, hubNums, 8, sel);
+    ui_menu_v(4, 6, hubItems, hubNums, 8, sel);
     ui_footer("Panah: pilih | Enter: ok | Esc: kembali");
     ui_message(17);
     ui_flush();
@@ -77,7 +79,7 @@ static void gambarSlot(void *ctx, int sel)
         nums[i] = i + 1;
     }
     gambarJudul("LOAD GAME", "Pilih slot penyimpanan");
-    ui_menu_v(6, 6, items, nums, SAVE_SLOTS, sel);
+    ui_menu_v(4, 6, items, nums, SAVE_SLOTS, sel);
     ui_footer("Enter: muat | Esc: batal");
     ui_message(17);
     ui_flush();
@@ -109,6 +111,37 @@ static int mintaNama(char *out, int max)
     }
 }
 
+static int mintaSeed(unsigned int *out)
+{
+    char buf[32];
+
+    ui_input_screen("GAME BARU");
+    for (;;) {
+        const char *p;
+        char *end;
+        unsigned long value;
+        int status;
+
+        ui_line_begin("Seed dunia (kosong = acak): ");
+        status = ui_line_read(buf, sizeof buf);
+        ui_line_end();
+        if (status <= 0) return 0;
+        p = buf;
+        while (*p == ' ') ++p;
+        if (*p == '\0') {
+            *out = (unsigned int)plat_rand();
+            return 1;
+        }
+        value = strtoul(p, &end, 10);
+        while (*end == ' ') ++end;
+        if (*end == '\0' && value <= 2000000000UL) {
+            *out = (unsigned int)value;
+            return 1;
+        }
+        ui_line_error("Seed harus angka 0 sampai 2000000000.");
+    }
+}
+
 static void bangunDunia(unsigned int seed, int dariSave)
 {
     pemain.seed = seed;
@@ -124,9 +157,7 @@ static void gameBaru(void)
 
     if (!mintaNama(nama, MAX_NAME)) return;
     initPlayer(&pemain, nama);
-    term_cooked();
-    seed = promptWorldSeed();
-    term_raw();
+    if (!mintaSeed(&seed)) return;
     bangunDunia(seed, 0);
     set_message("Selamat datang, %s!", pemain.name);
 }
