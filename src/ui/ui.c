@@ -380,7 +380,7 @@ int ui_menu_pick(const char *const *items, const int *nums, int n,
         char ch;
         for (;;) {
             draw(ctx, sel);
-            ui_footer(NULL);
+            if (widget_footer_row() < 0) ui_footer(NULL);
             ui_flush();
             {
                 TermKey k = term_getkey(&ch);

@@ -146,6 +146,7 @@ yang sama.
 
 ## Helper UI untuk P2-P5
 
+Panduan lengkap: [`docs/UI-API.md`](docs/UI-API.md). Ringkasnya,
 `src/ui/ui.h` menyediakan helper layar supaya modul lain tidak perlu menulis
 koordinat header/footer sendiri:
 
