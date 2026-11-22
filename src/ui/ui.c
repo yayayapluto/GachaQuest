@@ -332,6 +332,7 @@ int ui_menu_pick(const char *const *items, const int *nums, int n,
                 case KEY_UP: sel = (sel + n - 1) % n; break;
                 case KEY_DOWN: sel = (sel + 1) % n; break;
                 case KEY_ENTER: return nums != NULL ? nums[sel] : minNum + sel;
+                case KEY_EOF: return -1;
                 case KEY_ESC: {
                     int i, hasBack = nums == NULL;
                     for (i = 0; nums != NULL && i < n; i++) if (nums[i] == 0) hasBack = 1;

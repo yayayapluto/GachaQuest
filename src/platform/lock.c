@@ -4,8 +4,11 @@
 
 #ifdef _WIN32
 #include <process.h>
+#include <windows.h>
 #define platform_pid() ((int)_getpid())
 #else
+#include <fcntl.h>
+#include <sys/file.h>
 #include <unistd.h>
 #define platform_pid() ((int)getpid())
 #endif
@@ -13,9 +16,16 @@
 #include "lock.h"
 
 #define LOCK_PATH "data/session.lock"
+#define GUARD_PATH "data/session.run"
 
 static int previousRunning;
 static int held;
+
+#ifdef _WIN32
+static HANDLE guardHandle = INVALID_HANDLE_VALUE;
+#else
+static int guardFd = -1;
+#endif
 
 static int readRunning(const char *path)
 {
@@ -29,16 +39,40 @@ static int readRunning(const char *path)
     return strncmp(buf, "RUNNING", 7) == 0;
 }
 
+static int writeStatus(const char *text)
+{
+    FILE *f = fopen(LOCK_PATH, "wb");
+    if (f == NULL) return 0;
+    fputs(text, f);
+    fclose(f);
+    return 1;
+}
+
 int lock_acquire(void)
 {
-    FILE *f;
+    char line[128];
 
     previousRunning = readRunning(LOCK_PATH);
-    f = fopen(LOCK_PATH, "wb");
-    if (f == NULL) return 0;
-    fprintf(f, "RUNNING pid=%d start=%ld\n", platform_pid(), (long)time(NULL));
-    fclose(f);
+    snprintf(line, sizeof line, "RUNNING pid=%d start=%ld\n",
+             platform_pid(), (long)time(NULL));
+#ifdef _WIN32
+    guardHandle = CreateFileA("data\\session.run", GENERIC_READ | GENERIC_WRITE, 0,
+                              NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (guardHandle == INVALID_HANDLE_VALUE) return 0;
+#else
+    guardFd = open(GUARD_PATH, O_RDWR | O_CREAT, 0644);
+    if (guardFd < 0) return 0;
+    if (flock(guardFd, LOCK_EX | LOCK_NB) != 0) {
+        close(guardFd);
+        guardFd = -1;
+        return 0;
+    }
+#endif
     held = 1;
+    if (!writeStatus(line)) {
+        lock_mark_clean();
+        return 0;
+    }
     return 1;
 }
 
@@ -54,11 +88,18 @@ int lock_previous_running(void)
 
 void lock_mark_clean(void)
 {
-    FILE *f;
     if (!held) return;
-    f = fopen(LOCK_PATH, "wb");
-    if (f == NULL) return;
-    fprintf(f, "CLEAN\n");
-    fclose(f);
+    writeStatus("CLEAN\n");
+#ifdef _WIN32
+    if (guardHandle != INVALID_HANDLE_VALUE) {
+        CloseHandle(guardHandle);
+        guardHandle = INVALID_HANDLE_VALUE;
+    }
+#else
+    if (guardFd >= 0) {
+        close(guardFd);
+        guardFd = -1;
+    }
+#endif
     held = 0;
 }
