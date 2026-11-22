@@ -27,15 +27,21 @@ static void gambarJudul(const char *judul, const char *info)
     if (info != NULL) render_text(4, 4, ST_TEXT, "%s", info);
 }
 
+static const char *const menuUtamaItems[] = {
+    "Game Baru", "Load Game", "Leaderboard", "Keluar"
+};
+static const int menuUtamaNums[] = { 1, 2, 3, 0 };
+static const char *const hubItems[] = {
+    "Status", "Battle", "Dungeon", "Gacha",
+    "Inventory", "Shop", "Simpan", "Keluar ke Menu Utama"
+};
+static const int hubNums[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+
 static void gambarMenuUtama(void *ctx, int sel)
 {
-    static const char *const items[] = {
-        "Game Baru", "Load Game", "Leaderboard", "Keluar"
-    };
-    static const int nums[] = { 1, 2, 3, 0 };
     (void)ctx;
     gambarJudul("GACHA QUEST", "Petualangan terminal deterministik per seed");
-    ui_menu_v(6, 6, items, nums, 4, sel);
+    ui_menu_v(6, 6, menuUtamaItems, menuUtamaNums, 4, sel);
     ui_footer("Panah: pilih | Enter: ok | Esc: batal");
     ui_message(17);
     ui_flush();
@@ -43,14 +49,9 @@ static void gambarMenuUtama(void *ctx, int sel)
 
 static void gambarHub(void *ctx, int sel)
 {
-    static const char *const items[] = {
-        "Status", "Battle", "Dungeon", "Gacha",
-        "Inventory", "Shop", "Simpan", "Keluar ke Menu Utama"
-    };
-    static const int nums[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
     (void)ctx;
     gambarJudul("HUB", "Pusat kegiatan petualangan");
-    ui_menu_v(5, 6, items, nums, 8, sel);
+    ui_menu_v(5, 6, hubItems, hubNums, 8, sel);
     ui_footer("Panah: pilih | Enter: ok | Esc: kembali");
     ui_message(17);
     ui_flush();
@@ -119,9 +120,10 @@ static void bangunDunia(unsigned int seed, int dariSave)
 static void gameBaru(void)
 {
     unsigned int seed;
+    char nama[MAX_NAME];
 
-    if (!mintaNama(pemain.name, MAX_NAME)) return;
-    initPlayer(&pemain, pemain.name);
+    if (!mintaNama(nama, MAX_NAME)) return;
+    initPlayer(&pemain, nama);
     term_cooked();
     seed = promptWorldSeed();
     term_raw();
@@ -151,7 +153,7 @@ static void hub(void)
         int pilihan;
         if (platform_shutdown_requested()) return;
         sebarSnapshot(AS_SCREEN_HUB);
-        pilihan = ui_menu_pick(NULL, NULL, 8, 1, 8, gambarHub, NULL);
+        pilihan = ui_menu_pick(hubItems, hubNums, 8, 1, 8, gambarHub, NULL);
         if (pilihan == 8 || pilihan < 1) return;
         switch (pilihan) {
             case 1: showStatus(&pemain); break;
@@ -181,7 +183,7 @@ int main(void)
     muatKatalog();
 
     while (!platform_shutdown_requested()) {
-        int pilihan = ui_menu_pick(NULL, NULL, 4, 0, 3, gambarMenuUtama, NULL);
+        int pilihan = ui_menu_pick(menuUtamaItems, menuUtamaNums, 4, 0, 3, gambarMenuUtama, NULL);
         if (pilihan < 0 || pilihan == 0) break;
         sebarSnapshot(AS_SCREEN_MENU);
         switch (pilihan) {

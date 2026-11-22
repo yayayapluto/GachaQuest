@@ -327,18 +327,20 @@ int ui_menu_pick(const char *const *items, const int *nums, int n,
                 switch (k) {
                 case KEY_UP: sel = (sel + n - 1) % n; break;
                 case KEY_DOWN: sel = (sel + 1) % n; break;
-                case KEY_ENTER: return nums[sel];
+                case KEY_ENTER: return nums != NULL ? nums[sel] : minNum + sel;
                 case KEY_ESC: {
-                    int i, hasBack = 0;
-                    for (i = 0; i < n; i++) if (nums[i] == 0) hasBack = 1;
+                    int i, hasBack = nums == NULL;
+                    for (i = 0; nums != NULL && i < n; i++) if (nums[i] == 0) hasBack = 1;
                     if (hasBack) return 0;
                     break;
                 }
                 case KEY_CHAR: {
                     if (ch >= '0' && ch <= '9') {
                         int d = ch - '0', i;
-                        for (i = 0; i < n; i++)
-                            if (nums[i] == d && d >= minNum && d <= maxNum) return d;
+                        for (i = 0; i < n; i++) {
+                            int num = nums != NULL ? nums[i] : minNum + i;
+                            if (num == d && d >= minNum && d <= maxNum) return d;
+                        }
                     } else if (ch == 'w' || ch == 'k') {
                         sel = (sel + n - 1) % n;
                     } else if (ch == 's' || ch == 'j') {
