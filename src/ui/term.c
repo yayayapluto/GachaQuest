@@ -234,8 +234,8 @@ TermKey term_getkey(char *ch)
         if (read(STDIN_FILENO, &c, 1) != 1) return KEY_EOF;
         if (c == 27) {
             /* lone ESC vs arrow prefix: short poll decides */
-            pfd.events = POLLIN;
-            ready = poll(&pfd, 1, 30);
+            pfd[0].events = POLLIN;
+            ready = poll(pfd, 1, 30);
             if (ready <= 0) return KEY_ESC;
             if (read(STDIN_FILENO, &c, 1) != 1) return KEY_ESC;
             if (c == '[' || c == 'O') {
