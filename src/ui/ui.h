@@ -48,6 +48,15 @@ void ui_list_panel(int row, int col, int w, int h, const char *title,
 /* Panel log: menggambar `lines` entri log terakhir, lengkap dengan stylenya. */
 void ui_log_panel(int row, int col, int w, int h, const char *title, int lines);
 
+/* Peta karakter (dungeon): gambar jendela w x h dari grid row-major `cells`
+   (stride = panjang satu baris), mulai di (camX, camY). `style` menentukan
+   gaya tiap sel; NULL berarti ST_TEXT. Sel di luar peta digambar kosong.
+   Kamera dan arti karakter tetap milik modul pemanggil. */
+typedef Style (*UiCellStyleFn)(void *ctx, int x, int y, char cell);
+void ui_map_draw(int row, int col, int w, int h,
+                 const char *cells, int stride, int mapW, int mapH,
+                 int camX, int camY, UiCellStyleFn style, void *ctx);
+
 void ui_panel(int row, int col, int w, int h, const char *title);
 void ui_hp_bar(int row, int col, int w, int hp, int maxHp);
 /* Exact-width HP bar shared by the Status panel and the Battle panel. */

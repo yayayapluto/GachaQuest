@@ -156,6 +156,7 @@ koordinat header/footer sendiri:
 | `ui_screen_end(hint)` | footer + pesan sistem + flush, sekali per frame |
 | `ui_list_panel(row, col, w, h, judul, items, n, sel)` | panel daftar dengan highlight dan scroll otomatis |
 | `ui_log_panel(row, col, w, h, judul, lines)` | panel berisi `lines` entri log terakhir, lengkap dengan style |
+| `ui_map_draw(row, col, w, h, cells, stride, mapW, mapH, camX, camY, style, ctx)` | jendela kamera peta karakter (dungeon), gaya per sel lewat callback |
 | `ui_line_begin/read/error/end` | input baris di dalam kotak Input (sudah menangani raw/cooked dan mode pipa) |
 | `ui_confirm_box(pertanyaan)` | konfirmasi Ya/Tidak inline, `1`/`0` |
 | `ui_menu_pick(...)` | loop menu; mengembalikan nomor pilihan, `-1` saat Esc |

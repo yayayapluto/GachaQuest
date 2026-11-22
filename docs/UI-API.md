@@ -96,7 +96,52 @@ int idx = ui_pick_row(jumlah, gambarTabel, ctx);
 
 Di mode pipa, pengguna mengetik nomor baris 1-based (`0` = batal).
 
-## 3. Log dan panel pendukung
+## 3. Peta dungeon
+
+`ui_map_draw` menggambar jendela kamera dari grid karakter. Modul yang punya
+peta cukup menyediakan grid, posisi kamera, dan callback gaya per sel.
+
+```c
+static Style gayaPeta(void *ctx, int x, int y, char c)
+{
+    LayarDungeon *d = ctx;
+    (void)x; (void)y;
+    switch (c) {
+    case '#': return ST_BIOME(d->biome);
+    case '@': return ST_ACCENT;
+    case 'E': return ST_DANGER;
+    case '$': return ST_GOLD;
+    default:  return ST_TEXT;
+    }
+}
+
+ui_map_draw(UI_CONTENT_ROW, 4, 25, 15,
+            (const char *)area, AREA_MAX, AREA_MAX, AREA_MAX,
+            camX, camY, gayaPeta, d);
+```
+
+| Parameter | Arti |
+|---|---|
+| `row, col` | sudut kiri atas di layar |
+| `w, h` | ukuran jendela kamera (dungeon: 25x15) |
+| `cells` | grid row-major, mis. `(const char *)area` |
+| `stride` | panjang satu baris grid, mis. `AREA_MAX` |
+| `mapW, mapH` | batas peta yang valid |
+| `camX, camY` | sel peta yang tampil di kiri atas |
+| `style` | callback gaya per sel; `NULL` = `ST_TEXT` |
+| `ctx` | diteruskan apa adanya ke callback |
+
+Aturan:
+
+- Helper hanya menggambar sel; border panel, judul, kamera, dan arti karakter
+  tetap milik modul dungeon.
+- Sel di luar `mapW`/`mapH` otomatis kosong, jadi kamera di pinggir peta aman.
+- `style` dipanggil untuk setiap sel, termasuk yang kosong; boleh
+  mengembalikan `ST_FOG_LEVEL`/`ST_BIOME` sesuai jarak dan biome.
+- Untuk peta berpanel, panggil `ui_panel` lebih dulu, lalu gambar peta di
+  dalamnya dengan offset satu sel.
+
+## 4. Log dan panel pendukung
 
 | Fungsi | Kegunaan |
 |---|---|
@@ -120,7 +165,7 @@ ui_log_panel(UI_CONTENT_ROW, 40, 56, 10, "Log", 8);
 ui_screen_end("Panah: gerak   Enter: aksi   Esc: keluar");
 ```
 
-## 4. Input baris
+## 5. Input baris
 
 Semua input teks memakai kotak Input sendiri. Jangan memakai `printf` + `fgets`
 langsung untuk layar, dan jangan memanggil `term_cooked()` sendiri.
@@ -168,7 +213,7 @@ Konversi dan aturan domain tetap di modul masing-masing. `util.h` hanya
 menyediakan `readInt`/`readIntTry` untuk alur teks lama; jangan dipakai di
 dalam layar.
 
-## 5. Konfirmasi
+## 6. Konfirmasi
 
 ```c
 if (ui_confirm_box("Simpan permainan sekarang?"))
@@ -178,7 +223,7 @@ if (ui_confirm_box("Simpan permainan sekarang?"))
 - `1` = Ya, `0` = Tidak/Esc/EOF.
 - Di mode pipa selalu `0`; jangan menggantungkan alur wajib pada konfirmasi.
 
-## 6. Gaya dan warna
+## 7. Gaya dan warna
 
 Gunakan token di `style.h`, jangan ANSI mentah:
 
@@ -197,7 +242,7 @@ render_span(row, col, lebar, fg, bg, teks);
 `render_*` adalah lapisan bawah; modul P2-P5 sebaiknya memakai helper widget di
 atas. Kalau butuh teks satu baris di luar panel, `render_text` boleh.
 
-## 7. Aturan yang wajib diikuti
+## 8. Aturan yang wajib diikuti
 
 1. Satu frame = `ui_screen_begin` -> isi -> `ui_screen_end` (atau
    `ui_frame` -> isi -> `ui_flush`). Jangan flush di tengah isi.
@@ -222,7 +267,7 @@ if (ui_interactive()) {
 Helper input/menu sendiri sudah memilih jalur pipa; kondisi di atas hanya
 diperlukan kalau modul memanggil `ui_screen_*` langsung di luar `ui_menu_pick`.
 
-## 8. Contoh lengkap: layar dengan menu + log + input
+## 9. Contoh lengkap: layar dengan menu + log + input
 
 ```c
 #include "ui.h"
@@ -258,7 +303,7 @@ int dungeonJalan(LayarDungeon *d)
 `Player` berasal dari `player.h` dan sudah tersedia untuk P2-P5. Struktur
 `LayarDungeon` hanya contoh pemegang state layar; sesuaikan dengan modulmu.
 
-## 9. Kalau layar bermasalah
+## 10. Kalau layar bermasalah
 
 | Gejala | Penyebab umum | Perbaikan |
 |---|---|---|

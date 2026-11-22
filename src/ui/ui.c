@@ -264,6 +264,31 @@ void ui_log_panel(int row, int col, int w, int h, const char *title, int lines)
         ui_log_draw(row + 1 + i, col + 2, w - 4, start + i);
 }
 
+
+void ui_map_draw(int row, int col, int w, int h,
+                 const char *cells, int stride, int mapW, int mapH,
+                 int camX, int camY, UiCellStyleFn style, void *ctx)
+{
+    int r, c;
+
+    if (cells == NULL || stride <= 0 || w <= 0 || h <= 0) return;
+    for (r = 0; r < h; r++) {
+        int y = camY + r;
+        for (c = 0; c < w; c++) {
+            int x = camX + c;
+            char ch = ' ';
+            Style st = ST_TEXT;
+
+            if (x >= 0 && x < mapW && y >= 0 && y < mapH) {
+                ch = cells[y * stride + x];
+                if (ch == '\0') ch = ' ';
+            }
+            if (style != NULL) st = style(ctx, x, y, ch);
+            render_char(row + r, col + c, st, (unsigned char)ch);
+        }
+    }
+}
+
 void ui_panel(int row, int col, int w, int h, const char *title)
 {
     widget_panel(row, col, w, h, title);
