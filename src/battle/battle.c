@@ -1,4 +1,5 @@
 #include "battle.h"
+#include "rng.h"
 
 static int runAbort;
 static int runEnded;
@@ -25,8 +26,10 @@ void resumeBattle(Player *p, Monster enemy, int enemyHp)
 
 int calculateDamage(int atk, int def)
 {
-    int dmg = atk - def;
-    return (dmg > 1) ? dmg : 1;
+    int base = atk - def;
+
+    if (base < 1) base = 1;
+    return base + (int)(plat_rand() % 4u);
 }
 
 int battleRunAborted(void)
