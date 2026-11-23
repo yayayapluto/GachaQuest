@@ -42,8 +42,17 @@ void resetPlayer(Player *p)
 
 void addExp(Player *p, int exp)
 {
-    (void)p;
-    (void)exp;
+    if (p == NULL || exp <= 0) return;
+    p->exp += exp;
+    while (p->level < MAX_LEVEL && p->exp >= p->level * 50) {
+        p->exp -= p->level * 50;
+        p->level++;
+        p->maxHp += 15;
+        p->atk += 2;
+        p->def += 1;
+        p->hp = p->maxHp;
+    }
+    if (p->level >= MAX_LEVEL) p->exp = 0;
 }
 
 int totalAtk(const Player *p)
