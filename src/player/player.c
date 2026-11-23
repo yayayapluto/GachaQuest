@@ -57,12 +57,24 @@ void addExp(Player *p, int exp)
 
 int totalAtk(const Player *p)
 {
-    return (p == NULL) ? 0 : p->atk;
+    int total;
+
+    if (p == NULL) return 0;
+    total = p->atk;
+    if (p->weaponIndex >= 0 && p->weaponIndex < MAX_ITEM)
+        total += p->inventory[p->weaponIndex].power;
+    return total;
 }
 
 int totalDef(const Player *p)
 {
-    return (p == NULL) ? 0 : p->def;
+    int total;
+
+    if (p == NULL) return 0;
+    total = p->def;
+    if (p->armorIndex >= 0 && p->armorIndex < MAX_ITEM)
+        total += p->inventory[p->armorIndex].power;
+    return total;
 }
 
 void showStatus(const Player *p)
