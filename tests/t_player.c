@@ -24,6 +24,8 @@ int main(void)
     p.level = 9;
     p.exp = 0;
     p.maxHp = 100 + 15 * 8;
+    p.atk = 10 + 2 * 8;
+    p.def = 3 + 8;
     addExp(&p, 10000);
     CHECK(p.level == MAX_LEVEL && p.exp == 0);
     CHECK(p.maxHp == 100 + 15 * 9 && p.atk == 10 + 2 * 9 && p.def == 3 + 9);
@@ -33,7 +35,7 @@ int main(void)
     CHECK(totalAtk(&p) == p.atk && totalDef(&p) == p.def);
     p.inventory[0].power = 7;
     p.weaponIndex = 0;
-    p.armorIndex = 0;
+    p.armorIndex = 1;
     p.inventory[1].power = 4;
     CHECK(totalAtk(&p) == p.atk + 7 && totalDef(&p) == p.def + 4);
     return 0;

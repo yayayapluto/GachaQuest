@@ -188,7 +188,18 @@ static void hub(void)
         if (pilihan == 8 || pilihan < 1) return;
         switch (pilihan) {
             case 1: showStatus(&pemain); break;
-            case 2: startBattle(&pemain, monsters, jumlahMonster); break;
+            case 2:
+                startBattle(&pemain, monsters, jumlahMonster);
+                if (battleRunEnded()) {
+                    battleClearRunEnded();
+                    if (battleGameOverScreen(&pemain)) {
+                        set_message("Run baru dimulai. Semoga beruntung!");
+                    } else {
+                        battleClearRunAbort();
+                        return;
+                    }
+                }
+                break;
             case 3: runDungeon(&pemain, katalog, jumlahItem, monsters, jumlahMonster); break;
             case 4: gachaMenu(&pemain, katalog, jumlahItem); break;
             case 5: inventoryMenu(&pemain); break;

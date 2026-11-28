@@ -92,7 +92,6 @@ void gachaMenu(Player *p, const Item catalog[], int count)
         return;
 
     ui_log_clear();  /* buang sisa log dari layar lain */
-    p->gold = 5000;  /* SEMENTARA untuk demo, HAPUS sebelum commit */
     set_message(""); /* buang pesan "Selamat datang" */
 
     for (;;)
