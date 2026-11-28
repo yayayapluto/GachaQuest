@@ -190,8 +190,33 @@ void battleClearRunEnded(void)
     runEnded = 0;
 }
 
+static const char *const aksiGameOver[] = { "Mulai ulang (reset run)", "Kembali ke menu utama" };
+static const int nomorGameOver[] = { 1, 0 };
+
+static void gambarGameOver(void *ctx, int sel)
+{
+    const Player *p = ctx;
+
+    ui_screen_begin("Game Over", NULL);
+    ui_panel(UI_CONTENT_ROW, 2, 46, 5, "Kamu dikalahkan");
+    render_text(UI_CONTENT_ROW + 1, 4, ST_DANGER, "%s  Lv %d  Skor %d",
+                p->name, p->level, p->score);
+    render_text(UI_CONTENT_ROW + 2, 4, ST_TEXT, "Run ini berakhir. Mulai run baru");
+    render_text(UI_CONTENT_ROW + 3, 4, ST_TEXT, "atau kembali ke menu utama.");
+    ui_menu_h(UI_CONTENT_ROW + 6, 2, aksiGameOver, nomorGameOver, 2, sel);
+    ui_screen_end(NULL);
+}
+
 int battleGameOverScreen(Player *p)
 {
-    (void)p;
+    int pilih;
+
+    if (p == NULL) return 0;
+    pilih = ui_menu_pick(aksiGameOver, nomorGameOver, 2, 0, 1, gambarGameOver, p);
+    if (pilih == 1) {
+        resetPlayer(p);
+        return 1;
+    }
+    runAbort = 1;
     return 0;
 }
